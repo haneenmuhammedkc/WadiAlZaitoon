@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 
 const Hero = ({ search, setSearch }) => {
   return (
-    <section className="relative bg-slate-900 text-white min-h-[956px] md:min-h-[810px] flex items-center justify-center overflow-hidden">
+    <section className="relative bg-slate-900 text-white min-h-screen h-[100dvh] flex items-center justify-center overflow-hidden">
       {/* herowadi.MP4 Video Background in Natural Brightness */}
       <video
         autoPlay
