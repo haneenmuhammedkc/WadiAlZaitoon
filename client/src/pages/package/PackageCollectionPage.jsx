@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { getPackages } from "../../services/package.service";
+import { getPackages } from "../../services/packageService";
 import PackageCard from "./PackageCard";
 import PackageCollection from "./PackageCollection";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "../../components/animations/Motion";

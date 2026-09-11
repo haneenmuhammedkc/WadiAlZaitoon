@@ -1,47 +1,60 @@
-export const apiFetch = async (url, options = {}) => {
-  const defaultHeaders = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
+import axiosInstance from "./axiosInstance";
 
-  const config = {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...(options.headers || {}),
-    },
-    credentials: "include",
-  };
+export const apiFetch = async (url, options = {}) => {
+  // Strip leading /api if present because axiosInstance has baseURL: "/api"
+  let endpoint = url;
+  if (endpoint.startsWith("/api/")) {
+    endpoint = endpoint.substring(4);
+  } else if (endpoint === "/api") {
+    endpoint = "";
+  }
+
+  const method = (options.method || "GET").toLowerCase();
 
   try {
-    const res = await fetch(url, config);
-    const contentType = res.headers.get("content-type");
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      const text = await res.text();
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { message: text || `HTTP Status ${res.status}` };
-      }
+    const config = {
+      headers: options.headers,
+    };
+    if (options.responseType) {
+      config.responseType = options.responseType;
     }
 
-    if (!res.ok) {
-      return {
-        success: false,
-        status: res.status,
-        message: data?.message || `Request failed with status ${res.status}`,
-        data,
-      };
+    let res;
+    if (method === "get") {
+      res = await axiosInstance.get(endpoint, config);
+    } else if (method === "post") {
+      const data = options.body
+        ? typeof options.body === "string"
+          ? JSON.parse(options.body)
+          : options.body
+        : {};
+      res = await axiosInstance.post(endpoint, data, config);
+    } else if (method === "put") {
+      const data = options.body
+        ? typeof options.body === "string"
+          ? JSON.parse(options.body)
+          : options.body
+        : {};
+      res = await axiosInstance.put(endpoint, data, config);
+    } else if (method === "delete") {
+      res = await axiosInstance.delete(endpoint, config);
+    } else if (method === "patch") {
+      const data = options.body
+        ? typeof options.body === "string"
+          ? JSON.parse(options.body)
+          : options.body
+        : {};
+      res = await axiosInstance.patch(endpoint, data, config);
     }
 
-    return data;
+    return res.data;
   } catch (error) {
+    if (error.response && error.response.data) {
+      return error.response.data;
+    }
     return {
       success: false,
-      status: 500,
+      status: error.response?.status || 500,
       message: error.message || "Network connection error",
     };
   }

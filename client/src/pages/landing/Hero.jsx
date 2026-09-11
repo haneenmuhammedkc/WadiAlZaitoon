@@ -4,8 +4,8 @@ import { Search } from "lucide-react";
 
 const Hero = ({ search, setSearch }) => {
   return (
-    <section className="relative bg-slate-900 text-white min-h-screen h-[100dvh] flex items-center justify-center overflow-hidden">
-      {/* herowadi.MP4 Video Background in Natural Brightness */}
+    <section className="relative bg-slate-900 text-white min-h-screen h-screen h-[100dvh] flex items-center justify-center overflow-hidden">
+      {/* Hero Video Background from Cloudinary */}
       <video
         autoPlay
         muted
@@ -15,10 +15,13 @@ const Hero = ({ search, setSearch }) => {
         poster="/assets/bg_jmg1.jpg"
         className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-100 transform scale-105"
       >
-        <source src="/assets/herowadi.MP4" type="video/mp4" />
+        <source
+          src="https://res.cloudinary.com/mjqklz7x/video/upload/v1789137145/herowadi.mp4"
+          type="video/mp4"
+        />
       </video>
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 z-10 py-16">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 z-10 py-12 md:py-16">
         <span className="px-8 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/30 font-extrabold text-xs uppercase tracking-wider backdrop-blur-md transition-all">
           Wadi Al Zaitoon Tourism
         </span>

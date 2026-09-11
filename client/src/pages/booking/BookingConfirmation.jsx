@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useBooking } from "./BookingContext";
-import { apiFetch } from "../../services/api";
+import axiosInstance from "../../services/axiosInstance";
 import { CheckCircle2, Download, MapPin, Calendar, Users, Hotel as HotelIcon, ArrowRight, ShieldCheck } from "lucide-react";
 
 const BookingConfirmation = () => {
@@ -26,18 +26,14 @@ const BookingConfirmation = () => {
     }
     try {
       setDownloading(true);
-      const response = await fetch(`/api/booking/${bookingId}/invoice`, {
-        method: "GET",
+      const response = await axiosInstance.get(`/booking/${bookingId}/invoice`, {
+        responseType: "blob",
         headers: {
           Accept: "application/pdf",
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to download invoice. Please try again from My Bookings.");
-      }
-
-      const blob = await response.blob();
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -48,7 +44,7 @@ const BookingConfirmation = () => {
       window.URL.revokeObjectURL(url);
       setDownloading(false);
     } catch (err) {
-      alert(err.message);
+      alert(err.response?.data?.message || err.message || "Failed to download invoice.");
       setDownloading(false);
     }
   };

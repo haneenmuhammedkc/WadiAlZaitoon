@@ -1,8 +1,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-coral-50: #ecfdf5;
+  --color-coral-100: #d1fae5;
+  --color-coral-200: #a7f3d0;
+  --color-coral-300: #6ee7b7;
+  --color-coral-400: #34d399;
+  --color-coral-500: #10b981;
+  --color-coral-600: #059669;
+  --color-coral-700: #047857;
+  --color-coral-800: #065f46;
+  --color-coral-900: #064e3b;
+  --color-coral: #059669;
+
+  --color-navy-50: #f8fafc;
+  --color-navy-100: #f1f5f9;
+  --color-navy-200: #e2e8f0;
+  --color-navy-300: #cbd5e1;
+  --color-navy-400: #94a3b8;
+  --color-navy-500: #64748b;
+  --color-navy-600: #475569;
+  --color-navy-700: #334155;
+  --color-navy-800: #1e293b;
+  --color-navy-900: #0f172a;
+  --color-navy-950: #020617;
+  --color-navy: #0F172A;
+
+  --color-forest-900: #0F172A;
+
+  --color-sage-600: #059669;
+  --color-sage-400: #10B981;
+
+  --color-ivory: #FFFFFF;
+  --color-ivory-dark: #F8FAFC;
+
+  --color-charcoal: #0F172A;
+  --color-charcoal-muted: #475569;
+
+  --color-lightneutral: #E2E8F0;
+
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-serif: "Plus Jakarta Sans", "Inter", sans-serif;
+
+  --breakpoint-xxsm: 332px;
+  --breakpoint-xsm: 432px;
+  --breakpoint-xlplus: 1400px;
+}
 
 @layer base {
   html {

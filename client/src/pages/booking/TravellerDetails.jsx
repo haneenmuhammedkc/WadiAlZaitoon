@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { User, ShieldAlert, CheckCircle, ArrowRight, ArrowLeft, Mail, Phone, Lock } from "lucide-react";
 
 const TravellerDetails = () => {
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const { packageId, bookingState, updateTravellerDetails } = useBooking();
 
   const totalGuestsCount = Math.max(1, (bookingState.adults || 1) + (bookingState.children || 0));

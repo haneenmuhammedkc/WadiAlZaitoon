@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, DollarSign, Tag, Image as ImageIcon, CheckCircle, AlertCircle } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { createPackage } from "../../services/packageService";
 import { fetchHotels } from "../../services/hotelService";
 import CloudinaryImageGallery from "../../components/admin/common/CloudinaryImageGallery";
 
@@ -72,10 +72,7 @@ const AddPackages = () => {
       setLoading(true);
       setError(false);
 
-      const data = await apiFetch("/api/package/create-package", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const data = await createPackage(formData);
 
       if (data?.success) {
         setLoading(false);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search, Trash2, Shield, User as UserIcon, Mail, Phone, MapPin } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getAllUsers as fetchAllUsersApi, deleteUserAdmin } from "../../services/userService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const AllUsers = () => {
@@ -12,7 +12,7 @@ const AllUsers = () => {
   const getUsers = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(`/api/user/getAllUsers?searchTerm=${encodeURIComponent(search)}`);
+      const data = await fetchAllUsersApi();
       if (Array.isArray(data)) {
         setAllUsers(data);
         setError(false);
@@ -38,9 +38,7 @@ const AllUsers = () => {
     if (CONFIRM) {
       setLoading(true);
       try {
-        const data = await apiFetch(`/api/user/delete-user/${userId}`, {
-          method: "DELETE",
-        });
+        const data = await deleteUserAdmin(userId);
         if (data?.success) {
           alert(data?.message || "User account deleted successfully!");
           getUsers();

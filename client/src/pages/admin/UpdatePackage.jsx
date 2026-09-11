@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getPackageById, updatePackage } from "../../services/packageService";
 import { fetchHotels } from "../../services/hotelService";
 import CloudinaryImageGallery from "../../components/admin/common/CloudinaryImageGallery";
 
@@ -48,7 +48,7 @@ const UpdatePackage = () => {
   const getPackageData = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(`/api/package/get-package-data/${params?.id}`);
+      const data = await getPackageById(params?.id);
       if (data?.success) {
         const pkg = data.packageData;
         const hotelId = pkg?.hotel?._id || pkg?.hotel || "";
@@ -117,10 +117,7 @@ const UpdatePackage = () => {
       setLoading(true);
       setError(false);
 
-      const data = await apiFetch(`/api/package/update-package/${params?.id}`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const data = await updatePackage(params?.id, formData);
 
       if (data?.success) {
         setLoading(false);

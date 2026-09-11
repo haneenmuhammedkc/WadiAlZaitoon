@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Search, Calendar, Trash2, Clock, CheckCircle, XCircle } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getAllUserBookings, deleteBookingHistory } from "../../services/bookingService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const MyHistory = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const [allBookings, setAllBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -16,9 +16,7 @@ const MyHistory = () => {
     if (!currentUser?._id) return;
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/get-allUserBookings/${currentUser._id}?searchTerm=${encodeURIComponent(search)}`
-      );
+      const data = await getAllUserBookings(currentUser._id);
       if (data?.success) {
         setAllBookings(data?.bookings || []);
         setLoading(false);
@@ -43,12 +41,7 @@ const MyHistory = () => {
     if (!CONFIRM) return;
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/delete-booking-history/${id}/${currentUser._id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const data = await deleteBookingHistory(id, currentUser._id);
       if (data?.success) {
         setLoading(false);
         alert(data?.message || "Booking History Deleted!");

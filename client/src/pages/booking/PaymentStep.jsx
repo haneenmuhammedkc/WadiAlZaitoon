@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { useBooking } from "./BookingContext";
-import { apiFetch } from "../../services/api";
+import { createOrder, verifyPayment } from "../../services/paymentService";
+import { submitTravellers } from "../../services/travellerService";
 import { CreditCard, Lock, ShieldCheck, AlertCircle, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 const PaymentStep = () => {
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const { packageId, packageData, bookingState, setConfirmedBooking, calculateTotals } = useBooking();
   const totals = calculateTotals();
 
@@ -39,20 +40,17 @@ const PaymentStep = () => {
       setError(false);
 
       // 1. Submit Pre-Payment Pending Booking & Server Order Creation
-      const orderRes = await apiFetch("/api/payment/create-order", {
-        method: "POST",
-        body: JSON.stringify({
-          packageId,
-          persons: totals.totalPersons,
-          date: bookingState.departureDate,
-          selectedRoom: bookingState.selectedRoom,
-          selectedAddOns: bookingState.selectedAddOns,
-          adults: bookingState.adults,
-          children: bookingState.children,
-          infants: bookingState.infants,
-          rooms: bookingState.rooms,
-          returnDate: bookingState.returnDate,
-        }),
+      const orderRes = await createOrder({
+        packageId,
+        persons: totals.totalPersons,
+        date: bookingState.departureDate,
+        selectedRoom: bookingState.selectedRoom,
+        selectedAddOns: bookingState.selectedAddOns,
+        adults: bookingState.adults,
+        children: bookingState.children,
+        infants: bookingState.infants,
+        rooms: bookingState.rooms,
+        returnDate: bookingState.returnDate,
       });
 
       if (!orderRes?.success) {
@@ -84,13 +82,10 @@ const PaymentStep = () => {
           handler: async function (response) {
             try {
               // 3. Post Payment Callback Payload to Backend for HMAC Signature Verification
-              const verifyRes = await apiFetch("/api/payment/verify-payment", {
-                method: "POST",
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
+              const verifyRes = await verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
               });
 
               if (verifyRes?.success) {
@@ -118,10 +113,7 @@ const PaymentStep = () => {
                     });
                   });
 
-                  await apiFetch(`/api/traveller/${bookingId}/travellers`, {
-                    method: "POST",
-                    body: JSON.stringify({ travellers: manifestArray }),
-                  });
+                  await submitTravellers(bookingId, { travellers: manifestArray });
                 } catch {
                   // Ignore manifest save non-blocking errors
                 }

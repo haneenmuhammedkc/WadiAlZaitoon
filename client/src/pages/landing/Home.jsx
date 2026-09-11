@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "../../services/api";
-import { getPackages } from "../../services/package.service";
+import { getPackages } from "../../services/packageService";
+import { getPackageRatings } from "../../services/ratingService";
 import { PageTransition } from "../../components/animations/Motion";
 import Hero from "./Hero";
 import WelcomeSection from "./WelcomeSection";
@@ -47,8 +47,10 @@ const Home = () => {
 
     const fetchRatings = async () => {
       try {
-        const data = await apiFetch("/api/rating/get-ratings/all?limit=6");
-        if (data?.success) {
+        const data = await getPackageRatings("all", 6);
+        if (Array.isArray(data)) {
+          setRatings(data);
+        } else if (data?.success) {
           setRatings(data.ratings || []);
         }
       } catch (err) {

@@ -3,7 +3,7 @@ import { useParams, useLocation, Outlet, Link } from "react-router-dom";
 import { BookingProvider } from "../../pages/booking/BookingContext";
 import BookingSummary from "../booking/BookingSummary";
 import { CHECKOUT_STEPS } from "../../constants/booking.constants";
-import { apiFetch } from "../../services/api";
+import { getPackageById } from "../../services/packageService";
 import { PageTransition } from "../animations/Motion";
 import { ShieldCheck } from "lucide-react";
 
@@ -30,7 +30,7 @@ const BookingLayout = () => {
       }
       try {
         setLoading(true);
-        const data = await apiFetch(`/api/package/get-package-data/${packageId}`);
+        const data = await getPackageById(packageId);
         if (data?.success && data?.packageData) {
           setPackageData(data.packageData);
           setLoading(false);

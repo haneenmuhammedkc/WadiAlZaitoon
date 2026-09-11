@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Search, Calendar, User as UserIcon, XCircle, CheckCircle, Users, FileText, X, AlertCircle, RefreshCw, ShieldCheck } from "lucide-react";
 import Chart from "../../components/ui/Chart";
-import { apiFetch } from "../../services/api";
+import { getCurrentBookings, cancelBooking } from "../../services/bookingService";
+import { getManifest } from "../../services/travellerService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
+import { useAuth } from "../../context/AuthContext";
 
 const AllBookings = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const [currentBookings, setCurrentBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -23,9 +24,7 @@ const AllBookings = () => {
   const getAllBookings = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/get-currentBookings?searchTerm=${encodeURIComponent(searchTerm)}`
-      );
+      const data = await getCurrentBookings();
       if (data?.success) {
         setCurrentBookings(data?.bookings || []);
         setLoading(false);
@@ -50,12 +49,7 @@ const AllBookings = () => {
     if (!CONFIRM) return;
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/cancel-booking/${id}/${currentUser._id}`,
-        {
-          method: "POST",
-        }
-      );
+      const data = await cancelBooking(id, currentUser._id);
       if (data?.success) {
         setLoading(false);
         alert(data?.message || "Booking Cancelled!");
@@ -78,7 +72,7 @@ const AllBookings = () => {
     setManifestData(null);
 
     try {
-      const data = await apiFetch(`/api/traveller/admin/manifest/${bookingId}`);
+      const data = await getManifest(bookingId);
       if (data?.success) {
         setManifestData(data);
       } else {

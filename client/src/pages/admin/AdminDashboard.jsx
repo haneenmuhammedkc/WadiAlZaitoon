@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import { Link, useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -26,10 +26,13 @@ import Payments from "./Payments";
 import RatingsReviews from "./RatingsReviews";
 import History from "./History";
 import AllHotels from "./AllHotels";
-import { apiFetch } from "../../services/api";
+import { getPaymentLedger } from "../../services/paymentService";
+import { getCurrentBookings } from "../../services/bookingService";
+import { getAllUsers } from "../../services/userService";
+import { getPackages } from "../../services/packageService";
 
 const AdminDashboard = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const context = useOutletContext();
   const activePanelId = context?.activePanelId ?? 0;
   const setActivePanelId = context?.setActivePanelId || (() => {});
@@ -52,10 +55,10 @@ const AdminDashboard = () => {
       try {
         setOverviewData((prev) => ({ ...prev, loading: true }));
         const [ledgerRes, bookingsRes, usersRes, packagesRes] = await Promise.allSettled([
-          apiFetch("/api/payment/admin/payment-ledger"),
-          apiFetch("/api/booking/get-currentBookings"),
-          apiFetch("/api/user/getAllUsers"),
-          apiFetch("/api/package/get-packages?limit=4"),
+          getPaymentLedger(),
+          getCurrentBookings(),
+          getAllUsers(),
+          getPackages("limit=4"),
         ]);
 
         let gross = 0;

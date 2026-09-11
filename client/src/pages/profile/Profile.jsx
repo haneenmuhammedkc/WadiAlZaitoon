@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,25 +14,15 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import {
-  updateUserStart,
-  updateUserSuccess,
-  updateUserFailure,
-  logOutStart,
-  logOutSuccess,
-  logOutFailure,
-  updatePassStart,
-  updatePassSuccess,
-  updatePassFailure,
-} from "../../redux/user/userSlice";
+import { useAuth } from "../../context/AuthContext";
 import MyBookings from "../booking/MyBookings";
-import { apiFetch } from "../../services/api";
+import { updateProfile, updatePassword as updatePasswordApi } from "../../services/userService";
+import { getUserCurrentBookings } from "../../services/bookingService";
 import { PageTransition, FadeIn } from "../../components/animations/Motion";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { user: currentUser, logout, updateUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -69,9 +58,7 @@ const Profile = () => {
       // Fetch active bookings count for overview card
       const fetchBookingsCount = async () => {
         try {
-          const data = await apiFetch(
-            `/api/booking/get-UserCurrentBookings/${currentUser._id}`
-          );
+          const data = await getUserCurrentBookings(currentUser._id);
           if (data?.success) {
             setActiveBookingsCount(data?.bookings?.length || 0);
           }
@@ -87,24 +74,18 @@ const Profile = () => {
   const handleUpdateUserDetails = async (e) => {
     e.preventDefault();
     try {
-      dispatch(updateUserStart());
-      const data = await apiFetch(`/api/user/update/${currentUser._id}`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const data = await updateProfile(currentUser._id, formData);
       if (data?.success) {
         alert(data?.message || "Profile details updated successfully!");
-        dispatch(updateUserSuccess(data?.user));
+        updateUser(data?.user);
         setIsEditingProfile(false);
       } else {
-        dispatch(updateUserFailure(data?.message));
         alert(data?.message || "Failed to update profile details");
         if (data?.status === 401) {
           navigate("/login");
         }
       }
     } catch (err) {
-      dispatch(updateUserFailure(err.message));
       alert(err.message);
     }
   };
@@ -125,27 +106,17 @@ const Profile = () => {
       return;
     }
     try {
-      dispatch(updatePassStart());
-      const data = await apiFetch(
-        `/api/user/update-password/${currentUser._id}`,
-        {
-          method: "POST",
-          body: JSON.stringify(updatePassword),
-        }
-      );
+      const data = await updatePasswordApi(currentUser._id, updatePassword);
       if (data?.success) {
-        dispatch(updatePassSuccess());
         alert(data?.message || "Password updated successfully!");
         setUpdatePassword({ oldpassword: "", newpassword: "" });
       } else {
-        dispatch(updatePassFailure(data?.message));
         alert(data?.message || "Failed to update password");
         if (data?.status === 401) {
           navigate("/login");
         }
       }
     } catch (err) {
-      dispatch(updatePassFailure(err.message));
       alert(err.message);
     }
   };
@@ -153,17 +124,10 @@ const Profile = () => {
   // Handle Logout
   const handleLogout = async () => {
     try {
-      dispatch(logOutStart());
-      const data = await apiFetch("/api/auth/logout");
-      if (data?.success !== true) {
-        dispatch(logOutFailure(data?.message));
-        alert(data?.message || "Logout failed");
-        return;
-      }
-      dispatch(logOutSuccess());
+      await logout();
       navigate("/login");
     } catch (error) {
-      dispatch(logOutFailure(error.message));
+      console.log(error);
     }
   };
 

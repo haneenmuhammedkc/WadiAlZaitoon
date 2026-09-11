@@ -1,35 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import AdminHeader from "../../components/admin/common/AdminHeader";
 import AdminSidebar from "../../components/admin/common/AdminSidebar";
 import { PageTransition } from "../../components/animations/Motion";
-import { apiFetch } from "../../services/api";
-import {
-  updateUserStart,
-  updateUserSuccess,
-  updateUserFailure,
-  logOutStart,
-  logOutSuccess,
-  logOutFailure,
-  deleteUserAccountStart,
-  deleteUserAccountSuccess,
-  deleteUserAccountFailure,
-} from "../../redux/user/userSlice";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { app } from "../../firebase";
+import { updateProfilePhoto, deleteUser } from "../../services/userService";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser, logout, updateUser } = useAuth();
 
   const [profilePhoto, setProfilePhoto] = useState(undefined);
   const [activePanelId, setActivePanelId] = useState(0);
@@ -79,20 +60,13 @@ const AdminLayout = () => {
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadUrl) => {
-            const data = await apiFetch(
-              `/api/user/update-profile-photo/${currentUser._id}`,
-              {
-                method: "POST",
-                body: JSON.stringify({ avatar: downloadUrl }),
-              }
-            );
+            const data = await updateProfilePhoto(currentUser._id, { avatar: downloadUrl });
             if (data?.success) {
               alert(data?.message || "Profile photo updated");
               setFormData((prev) => ({ ...prev, avatar: downloadUrl }));
-              dispatch(updateUserSuccess(data?.user));
+              updateUser(data?.user);
               setProfilePhoto(null);
             } else {
-              dispatch(updateUserFailure(data?.message));
               alert(data?.message || "Failed to update profile photo");
             }
           });
@@ -106,15 +80,9 @@ const AdminLayout = () => {
 
   const handleLogout = async () => {
     try {
-      dispatch(logOutStart());
-      const data = await apiFetch("/api/auth/logout");
-      if (data?.success !== true) {
-        dispatch(logOutFailure(data?.message));
-        return;
-      }
-      dispatch(logOutSuccess());
+      await logout();
       navigate("/login");
-      alert(data?.message || "Logged out successfully");
+      alert("Logged out successfully");
     } catch (error) {
       console.log(error);
     }
@@ -127,20 +95,16 @@ const AdminLayout = () => {
     );
     if (CONFIRM) {
       try {
-        dispatch(deleteUserAccountStart());
-        const data = await apiFetch(`/api/user/delete/${currentUser._id}`, {
-          method: "DELETE",
-        });
+        const data = await deleteUser(currentUser._id);
         if (data?.success === false) {
-          dispatch(deleteUserAccountFailure(data?.message));
           alert("Something went wrong!");
           return;
         }
-        dispatch(deleteUserAccountSuccess());
+        await logout();
         alert(data?.message || "Account deleted");
         navigate("/signup");
       } catch (error) {
-        dispatch(deleteUserAccountFailure(error.message));
+        alert(error.message);
       }
     }
   };

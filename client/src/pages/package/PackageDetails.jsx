@@ -26,10 +26,10 @@ import {
   XCircle,
   Lock,
 } from "lucide-react";
-import Rating from "@mui/material/Rating";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import RatingCard from "../RatingCard";
-import { apiFetch } from "../../services/api";
+import { getPackageById } from "../../services/packageService";
+import { submitRating, getPackageRatings, checkRatingGiven as checkRatingGivenApi } from "../../services/ratingService";
 import { PageTransition } from "../../components/animations/Motion";
 
 const sampleFallbackPackages = {
@@ -132,7 +132,7 @@ const sampleFallbackPackages = {
 };
 
 const PackageDetails = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -202,7 +202,7 @@ const PackageDetails = () => {
       }
 
       // Query Backend API
-      const data = await apiFetch(`/api/package/get-package-data/${params?.id}`);
+      const data = await getPackageById(params?.id);
       if (data?.success && data?.packageData) {
         setPackageData({
           _id: data?.packageData?._id || params?.id || "",
@@ -255,13 +255,10 @@ const PackageDetails = () => {
     }
     try {
       setLoading(true);
-      const data = await apiFetch("/api/rating/give-rating", {
-        method: "POST",
-        body: JSON.stringify({
-          ...ratingsData,
-          packageId: params?.id,
-          userRef: currentUser?._id,
-        }),
+      const data = await submitRating({
+        ...ratingsData,
+        packageId: params?.id,
+        userRef: currentUser?._id,
       });
       if (data?.success) {
         setLoading(false);
@@ -281,7 +278,7 @@ const PackageDetails = () => {
 
   const getRatings = async () => {
     try {
-      const data = await apiFetch(`/api/rating/get-ratings/${params.id}/10`);
+      const data = await getPackageRatings(params.id, 10);
       if (Array.isArray(data)) {
         setPackageRatings(data);
       } else {
@@ -295,9 +292,7 @@ const PackageDetails = () => {
   const checkRatingGiven = async () => {
     if (!currentUser?._id || !params?.id) return;
     try {
-      const data = await apiFetch(
-        `/api/rating/rating-given/${currentUser?._id}/${params?.id}`
-      );
+      const data = await checkRatingGivenApi(currentUser?._id, params?.id);
       setRatingGiven(!!data?.given);
     } catch {
       // Ignore rating error gracefully

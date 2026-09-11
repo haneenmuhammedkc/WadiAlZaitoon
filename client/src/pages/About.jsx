@@ -16,7 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "../components/animations/Motion";
-import { getPackages } from "../services/package.service";
+import { getPackages } from "../services/packageService";
 import PackageCard from "./package/PackageCard";
 
 const About = () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import {
   Hotel,
   Search,
@@ -24,7 +24,7 @@ import {
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const AllHotels = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Star, MessageSquare } from "lucide-react";
 import RatingCard from "./RatingCard";
-import { apiFetch } from "../services/api";
+import { getPackageRatings, getAverageRating } from "../services/ratingService";
 import { PageTransition, FadeIn } from "../components/animations/Motion";
 
 const RatingsPage = () => {
@@ -17,8 +17,8 @@ const RatingsPage = () => {
   const getRatings = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(`/api/rating/get-ratings/${params.id}/100`);
-      const data2 = await apiFetch(`/api/rating/average-rating/${params.id}`);
+      const data = await getPackageRatings(params.id, 100);
+      const data2 = await getAverageRating(params.id);
       if (Array.isArray(data)) {
         setPackageRatings(data);
       } else {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import {
   Search,
   DollarSign,
@@ -15,10 +14,11 @@ import {
   Eye,
   FileText,
 } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
+import { getPaymentLedger as fetchPaymentLedgerApi, processRefund } from "../../services/paymentService";
 
 const Payments = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("payments"); // "payments" | "refunds"
   const [payments, setPayments] = useState([]);
   const [refunds, setRefunds] = useState([]);
@@ -50,9 +50,7 @@ const Payments = () => {
   const getPaymentLedger = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/payment/admin/payment-ledger?searchTerm=${encodeURIComponent(search)}&status=${encodeURIComponent(statusFilter)}`
-      );
+      const data = await fetchPaymentLedgerApi();
       if (data?.success) {
         setPayments(data?.payments || []);
         setRefunds(data?.refunds || []);
@@ -121,14 +119,11 @@ const Payments = () => {
         Math.random() * 1000
       )}`;
 
-      const res = await apiFetch("/api/payment/admin/refund", {
-        method: "POST",
-        body: JSON.stringify({
-          bookingId: selectedPaymentForRefund.bookingId,
-          amount,
-          reason: refundReasonInput || "Admin initiated refund",
-          idempotencyKey,
-        }),
+      const res = await processRefund({
+        bookingId: selectedPaymentForRefund.bookingId,
+        amount,
+        reason: refundReasonInput || "Admin initiated refund",
+        idempotencyKey,
       });
 
       setSubmittingRefund(false);

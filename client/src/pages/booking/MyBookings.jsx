@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Search, Calendar, MapPin, XCircle, Compass, ArrowRight, RefreshCw, CreditCard, Users, FileText, CheckCircle, AlertCircle, X, ShieldAlert } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getUserCurrentBookings, cancelBooking, downloadInvoice } from "../../services/bookingService";
+import { retryOrder, verifyPayment } from "../../services/paymentService";
+import { getTravellers, submitTravellers } from "../../services/travellerService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const MyBookings = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const [currentBookings, setCurrentBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -18,41 +20,17 @@ const MyBookings = () => {
     if (downloadingInvoiceId) return;
     try {
       setDownloadingInvoiceId(bookingId);
-      const response = await fetch(`/api/booking/${bookingId}/invoice`, {
-        method: "GET",
-        headers: {
-          Accept: "application/pdf",
-        },
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        let errorMsg = "Failed to download invoice.";
-        try {
-          const errorJson = await response.json();
-          errorMsg = errorJson.message || errorMsg;
-        } catch (e) {
-          // ignore
-        }
-        alert(errorMsg);
+      const blob = await downloadInvoice(bookingId);
+      if (blob?.success === false) {
+        alert(blob.message || "Failed to download invoice.");
         return;
       }
 
-      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.style.display = "none";
       a.href = url;
-
-      const disposition = response.headers.get("Content-Disposition");
-      let filename = `INV-${bookingId.slice(-6).toUpperCase()}.pdf`;
-      if (disposition && disposition.includes("filename=")) {
-        const match = disposition.match(/filename="?([^";]+)"?/);
-        if (match && match[1]) {
-          filename = match[1];
-        }
-      }
-      a.download = filename;
+      a.download = `INV-${bookingId.slice(-6).toUpperCase()}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -76,9 +54,7 @@ const MyBookings = () => {
     if (!currentUser?._id) return;
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/get-UserCurrentBookings/${currentUser._id}?searchTerm=${encodeURIComponent(searchTerm)}`
-      );
+      const data = await getUserCurrentBookings(currentUser._id);
       if (data?.success) {
         setCurrentBookings(data?.bookings || []);
         setLoading(false);
@@ -104,12 +80,7 @@ const MyBookings = () => {
 
     try {
       setLoading(true);
-      const data = await apiFetch(
-        `/api/booking/cancel-booking/${id}/${currentUser._id}`,
-        {
-          method: "POST",
-        }
-      );
+      const data = await cancelBooking(id, currentUser._id);
       if (data?.success) {
         setLoading(false);
         alert(data?.message || "Booking Cancelled!");
@@ -128,9 +99,7 @@ const MyBookings = () => {
     if (!currentUser?._id || retryingId) return;
     try {
       setRetryingId(bookingId);
-      const res = await apiFetch(`/api/payment/retry-order/${bookingId}`, {
-        method: "POST",
-      });
+      const res = await retryOrder(bookingId);
 
       if (!res?.success) {
         alert(res?.message || "Failed to initiate payment retry.");
@@ -157,13 +126,10 @@ const MyBookings = () => {
           theme: { color: "#0F2C23" },
           handler: async function (response) {
             try {
-              const verifyRes = await apiFetch("/api/payment/verify-payment", {
-                method: "POST",
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
+              const verifyRes = await verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
               });
 
               if (verifyRes?.success) {
@@ -208,7 +174,7 @@ const MyBookings = () => {
     const totalPersons = Number(booking.persons) || 1;
 
     try {
-      const data = await apiFetch(`/api/traveller/${booking._id}/travellers`);
+      const data = await getTravellers(booking._id);
       if (data?.success && Array.isArray(data.travellers) && data.travellers.length > 0) {
         const existingMap = {};
         data.travellers.forEach((t) => {
@@ -323,10 +289,7 @@ const MyBookings = () => {
         })),
       };
 
-      const data = await apiFetch(`/api/traveller/${selectedBooking._id}/travellers`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      const data = await submitTravellers(selectedBooking._id, payload);
 
       if (data?.success) {
         setManifestSuccess("Passenger details submitted successfully!");

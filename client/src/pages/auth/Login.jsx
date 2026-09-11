@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight } from "lucide-react";
-import {
-  loginStart,
-  loginSuccess,
-  loginFailure,
-} from "../../redux/user/userSlice.js";
-import { apiFetch } from "../../services/api";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 import { PageTransition, FadeIn } from "../../components/animations/Motion";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const { currentUser, loading, error } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const { user: currentUser, login, loading, error } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (currentUser) {
       const targetPath =
-        currentUser.user_role === 1 ? "/profile/admin" : "/";
+        currentUser.user_role === 1 || currentUser.user_role === "admin" ? "/profile/admin" : "/";
       navigate(targetPath, { replace: true });
     }
   }, [currentUser, navigate]);
@@ -34,28 +27,14 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      dispatch(loginStart());
-      const data = await apiFetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-
-      if (data?.success === false) {
-        dispatch(loginFailure(data.message));
-        return;
-      }
-
-      const loggedInUser = data.user || data;
-      dispatch(loginSuccess(loggedInUser));
-
-      if (loggedInUser?.user_role === 1) {
+    const result = await login(formData);
+    if (result.success) {
+      const loggedInUser = result.user;
+      if (loggedInUser?.user_role === 1 || loggedInUser?.user_role === "admin") {
         navigate("/profile/admin", { replace: true });
       } else {
         navigate("/", { replace: true });
       }
-    } catch (err) {
-      dispatch(loginFailure(err.message));
     }
   };
 

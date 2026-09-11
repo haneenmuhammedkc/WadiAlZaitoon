@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { MapPin, Clock, Calendar, Users, ShieldCheck, CheckCircle2, AlertCircle, CreditCard, Lock } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getPackageById } from "../../services/packageService";
+import { createOrder, verifyPayment } from "../../services/paymentService";
 import { PageTransition, FadeIn } from "../../components/animations/Motion";
 
 const Booking = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { user: currentUser } = useAuth();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -55,7 +56,7 @@ const Booking = () => {
   const getPackageData = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch(`/api/package/get-package-data/${params?.packageId}`);
+      const data = await getPackageById(params?.packageId);
       if (data?.success) {
         setPackageData({
           packageName: data?.packageData?.packageName || "",
@@ -124,13 +125,10 @@ const Booking = () => {
       setProcessingPayment(true);
 
       // 1. Create Pending Booking & Razorpay Order on Backend (Server-Authoritative Price Calculation)
-      const orderRes = await apiFetch("/api/payment/create-order", {
-        method: "POST",
-        body: JSON.stringify({
-          packageId: params?.packageId,
-          persons: bookingData.persons,
-          date: bookingData.date,
-        }),
+      const orderRes = await createOrder({
+        packageId: params?.packageId,
+        persons: bookingData.persons,
+        date: bookingData.date,
       });
 
       if (!orderRes?.success) {
@@ -162,13 +160,10 @@ const Booking = () => {
           handler: async function (response) {
             // 3. Post Payment Callback Payload to Backend for HMAC Signature Verification & Atomic Confirmation
             try {
-              const verifyRes = await apiFetch("/api/payment/verify-payment", {
-                method: "POST",
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
+              const verifyRes = await verifyPayment({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
               });
 
               if (verifyRes?.success) {

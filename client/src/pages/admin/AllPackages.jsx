@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Edit3, Trash2, Tag, Star, MapPin, Eye } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getPackages as fetchPackagesApi, deletePackage } from "../../services/packageService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const AllPackages = () => {
@@ -15,15 +15,15 @@ const AllPackages = () => {
     setPackages([]);
     try {
       setLoading(true);
-      let url =
+      let query =
         filter === "offer"
-          ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&offer=true`
+          ? `searchTerm=${encodeURIComponent(search)}&offer=true`
           : filter === "latest"
-          ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=createdAt`
+          ? `searchTerm=${encodeURIComponent(search)}&sort=createdAt`
           : filter === "top"
-          ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=packageRating`
-          : `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}`;
-      const data = await apiFetch(url);
+          ? `searchTerm=${encodeURIComponent(search)}&sort=packageRating`
+          : `searchTerm=${encodeURIComponent(search)}`;
+      const data = await fetchPackagesApi(query);
       if (data?.success) {
         setPackages(data?.packages || []);
         setLoading(false);
@@ -45,15 +45,15 @@ const AllPackages = () => {
   const onShowMoreSClick = async () => {
     const numberOfPackages = packages.length;
     const startIndex = numberOfPackages;
-    let url =
+    let query =
       filter === "offer"
-        ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&offer=true&startIndex=${startIndex}`
+        ? `searchTerm=${encodeURIComponent(search)}&offer=true&startIndex=${startIndex}`
         : filter === "latest"
-        ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=createdAt&startIndex=${startIndex}`
+        ? `searchTerm=${encodeURIComponent(search)}&sort=createdAt&startIndex=${startIndex}`
         : filter === "top"
-        ? `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=packageRating&startIndex=${startIndex}`
-        : `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&startIndex=${startIndex}`;
-    const data = await apiFetch(url);
+        ? `searchTerm=${encodeURIComponent(search)}&sort=packageRating&startIndex=${startIndex}`
+        : `searchTerm=${encodeURIComponent(search)}&startIndex=${startIndex}`;
+    const data = await fetchPackagesApi(query);
     if (!data?.packages || data?.packages?.length < 9) {
       setShowMoreBtn(false);
     }
@@ -71,9 +71,7 @@ const AllPackages = () => {
     if (!CONFIRM) return;
     try {
       setLoading(true);
-      const data = await apiFetch(`/api/package/delete-package/${packageId}`, {
-        method: "DELETE",
-      });
+      const data = await deletePackage(packageId);
       alert(data?.message || "Package Deleted!");
       getPackages();
       setLoading(false);

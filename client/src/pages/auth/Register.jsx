@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff, UserPlus } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { signup } from "../../services/authService";
 import { PageTransition, FadeIn } from "../../components/animations/Motion";
 
 const Register = () => {
@@ -27,10 +27,7 @@ const Register = () => {
     try {
       setLoading(true);
       setError(false);
-      const data = await apiFetch("/api/auth/signup", {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
+      const data = await signup(formData);
 
       if (data?.success === false) {
         setError(data.message);

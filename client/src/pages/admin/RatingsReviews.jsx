@@ -2,7 +2,7 @@ import { Rating } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Star, MessageSquare, ArrowRight, Package as PackageIcon } from "lucide-react";
-import { apiFetch } from "../../services/api";
+import { getPackages as fetchPackagesApi } from "../../services/packageService";
 import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const RatingsReviews = () => {
@@ -16,8 +16,8 @@ const RatingsReviews = () => {
     setPackages([]);
     try {
       setLoading(true);
-      let url = `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=packageRating`;
-      const data = await apiFetch(url);
+      const query = `searchTerm=${encodeURIComponent(search)}&sort=packageRating`;
+      const data = await fetchPackagesApi(query);
       if (data?.success) {
         setPackages(data?.packages || []);
         setLoading(false);
@@ -43,8 +43,8 @@ const RatingsReviews = () => {
   const onShowMoreSClick = async () => {
     const numberOfPackages = packages.length;
     const startIndex = numberOfPackages;
-    let url = `/api/package/get-packages?searchTerm=${encodeURIComponent(search)}&sort=packageRating&startIndex=${startIndex}`;
-    const data = await apiFetch(url);
+    const query = `searchTerm=${encodeURIComponent(search)}&sort=packageRating&startIndex=${startIndex}`;
+    const data = await fetchPackagesApi(query);
     if (!data?.packages || data?.packages?.length < 9) {
       setShowMoreBtn(false);
     }
