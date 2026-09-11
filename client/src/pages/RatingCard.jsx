@@ -1,121 +1,69 @@
 import { Rating } from "@mui/material";
 import React from "react";
-import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import defaultProfileImg from "../assets/images/profile.png";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Quote } from "lucide-react";
 
-const RatingCard = ({ packageRatings }) => {
+const RatingCard = ({ ratingData }) => {
+  if (!ratingData || ratingData.length === 0) {
+    return (
+      <div className="py-12 text-center text-xs text-slate-500">
+        No traveler reviews submitted yet.
+      </div>
+    );
+  }
+
   return (
-    <>
-      {packageRatings &&
-        packageRatings.map((rating, i) => {
-          return (
-            <div
-              key={i}
-              className="main relative w-full rounded-lg border p-3 gap-2 flex flex-col"
-              id="main"
-            >
-              <div className="flex gap-2 items-center">
-                <img
-                  src={rating.userProfileImg || defaultProfileImg}
-                  alt={rating.username[0]}
-                  className="border w-6 h-6 border-black rounded-[50%]"
-                />
-                <p className="font-semibold">{rating.username}</p>
-              </div>
+    <Swiper
+      modules={[Navigation, Autoplay, Pagination]}
+      spaceBetween={24}
+      slidesPerView={1}
+      breakpoints={{
+        640: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+      }}
+      autoplay={{ delay: 5000, disableOnInteraction: false }}
+      pagination={{ clickable: true }}
+      className="pb-12"
+    >
+      {ratingData.map((rate, i) => (
+        <SwiperSlide key={rate._id || i}>
+          <div className="p-6 rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full space-y-4 relative">
+            <Quote className="w-8 h-8 text-coral-100 absolute top-6 right-6 pointer-events-none" />
+
+            <div className="space-y-3">
               <Rating
-                value={rating.rating || 0}
+                value={Number(rate.rating || 5)}
+                precision={0.5}
                 readOnly
                 size="small"
-                precision={0.1}
               />
-              {/* review */}
-              <p className="break-all">
-                <span
-                  className="break-all"
-                  id={rating.review.length > 90 ? "review-text" : "none"}
-                >
-                  {rating.review !== ""
-                    ? rating.review.length > 90
-                      ? rating.review.substring(0, 45)
-                      : rating.review
-                    : rating.rating < 3
-                    ? "Not Bad"
-                    : "Good"}
-                </span>
-                {rating.review.length > 90 && (
-                  <>
-                    <button
-                      id="more-btn"
-                      className={`m-1 font-semibold items-center gap-1 ${
-                        rating.review.length > 90 ? "flex" : "hidden"
-                      }`}
-                      onClick={() => {
-                        document.getElementById("popup").style.display =
-                          "block";
-                        document.getElementById("popup").style.zIndex = "99";
-                      }}
-                    >
-                      More
-                      <FaArrowDown />
-                    </button>
-                  </>
-                )}
+              <p className="text-xs text-slate-700 font-normal leading-relaxed line-clamp-4">
+                "{rate.review || "Wonderful tour experience with Wadi Al Zaitoon Tourism!"}"
               </p>
-              {/* full review */}
-              {rating.review.length > 90 && (
-                <div
-                  className="hidden bg-white absolute left-0 top-0 popup"
-                  id="popup"
-                >
-                  <div
-                    key={i}
-                    className="relative w-full rounded-lg border p-3 gap-2 flex flex-col"
-                  >
-                    <div className="flex gap-2 items-center">
-                      <img
-                        src={rating.userProfileImg || defaultProfileImg}
-                        alt={rating.username[0]}
-                        className="border w-6 h-6 border-black rounded-[50%]"
-                      />
-                      <p className="font-semibold">{rating.username}</p>
-                    </div>
-                    <Rating
-                      value={rating.rating || 0}
-                      readOnly
-                      size="small"
-                      precision={0.1}
-                    />
-                    {/* review */}
-                    <p className="break-words">
-                      <span
-                        className="break-words"
-                        id={rating.review.length > 90 ? "review-text" : "none"}
-                      >
-                        {rating.review}
-                      </span>
-                      {rating.review.length > 90 && (
-                        <>
-                          <button
-                            id="less-btn"
-                            className={`m-1 font-semibold flex items-center gap-1`}
-                            onClick={() => {
-                              document.getElementById("popup").style.display =
-                                "none";
-                            }}
-                          >
-                            Less
-                            <FaArrowUp />
-                          </button>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {/* full review */}
             </div>
-          );
-        })}
-    </>
+
+            <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
+              <img
+                src={rate.user?.avatar || defaultProfileImg}
+                alt={rate.user?.username || "Traveler"}
+                className="w-10 h-10 rounded-full object-cover border border-slate-200"
+              />
+              <div>
+                <h4 className="font-bold text-sm text-slate-900">
+                  {rate.user?.username || "Guest Traveler"}
+                </h4>
+                <span className="text-[10px] text-slate-400 font-medium block">Verified Customer</span>
+              </div>
+            </div>
+          </div>
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 };
 

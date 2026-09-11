@@ -1,6 +1,7 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { Search, Trash2, Shield, User as UserIcon, Mail, Phone, MapPin } from "lucide-react";
+import { apiFetch } from "../../services/api";
+import { StaggerContainer, StaggerItem } from "../../components/animations/Motion";
 
 const AllUsers = () => {
   const [allUser, setAllUsers] = useState([]);
@@ -11,112 +12,150 @@ const AllUsers = () => {
   const getUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/user/getAllUsers?searchTerm=${search}`);
-      const data = await res.json();
-
-      if (data && data?.success === false) {
-        setLoading(false);
-        setError(data?.message);
-      } else {
-        setLoading(false);
+      const data = await apiFetch(`/api/user/getAllUsers?searchTerm=${encodeURIComponent(search)}`);
+      if (Array.isArray(data)) {
         setAllUsers(data);
         setError(false);
+      } else if (data && data?.success === false) {
+        setAllUsers([]);
+        setError(false); // Graceful empty handling for search/filter
+      } else {
+        setAllUsers([]);
       }
-    } catch (error) {
-      console.log(error);
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message);
     }
   };
+
   useEffect(() => {
     getUsers();
-    if (search) getUsers();
   }, [search]);
 
   const handleUserDelete = async (userId) => {
-    const CONFIRM = confirm(
-      "Are you sure ? the account will be permenantly deleted!"
-    );
+    const CONFIRM = window.confirm("Are you sure? This user account will be permanently deleted!");
     if (CONFIRM) {
       setLoading(true);
       try {
-        const res = await fetch(`/api/user/delete-user/${userId}`, {
+        const data = await apiFetch(`/api/user/delete-user/${userId}`, {
           method: "DELETE",
         });
-        const data = await res.json();
-        if (data?.success === false) {
-          setLoading(false);
-          alert("Something went wrong!");
-          return;
+        if (data?.success) {
+          alert(data?.message || "User account deleted successfully!");
+          getUsers();
+        } else {
+          alert(data?.message || "Something went wrong!");
         }
         setLoading(false);
-        alert(data?.message);
-        getUsers();
-      } catch (error) {}
+      } catch (err) {
+        setLoading(false);
+        alert(err.message);
+      }
     }
   };
 
   return (
-    <>
-      <div className="w-full flex justify-center">
-        <div className="w-full shadow-lg rounded-lg p-2">
-          <h1 className="text-2xl text-center">
-            {loading ? "Loading..." : "All Users"}
-          </h1>
-          {error && <h1 className="text-center text-2xl">{error}</h1>}
-          <div>
-            <input
-              type="text"
-              className="my-3 p-2 rounded-lg border"
-              placeholder="Search name,email or phone..."
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-            />
-            <h2 className="text-xl font-semibold mb-2 ml-2">
-              Total Users: {allUser.length ? allUser?.length : "Loading..."}
-            </h2>
-          </div>
-          {allUser ? (
-            allUser.map((user, i) => {
-              return (
-                <div
-                  className="flex overflow-auto justify-between p-2 px-3 border-y-2 gap-3"
-                  key={i}
-                >
-                  <h5 className="flex flex-1 justify-center items-center text-ellipsis p-[5px]">
-                    {user._id}
-                  </h5>
-                  <h5 className="flex flex-1 justify-center items-center text-ellipsis p-[5px]">
-                    {user.username}
-                  </h5>
-                  <h5 className="flex flex-1 justify-center items-center text-ellipsis p-[5px]">
-                    {user.email}
-                  </h5>
-                  <h5 className="flex flex-1 justify-center items-center text-ellipsis p-[5px]">
-                    {user.address}
-                  </h5>
-                  <h5 className="flex flex-1 justify-center items-center text-ellipsis p-[5px]">
-                    {user.phone}
-                  </h5>
-                  <div className="flex flex-col flex-1 justify-center items-center p-[5px]">
-                    <button
-                      disabled={loading}
-                      className="p-2 text-red-500 hover:cursor-pointer hover:scale-125 disabled:opacity-80"
-                      onClick={() => {
-                        handleUserDelete(user._id);
-                      }}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <></>
-          )}
+    <div className="w-full space-y-6 font-sans">
+      
+      {/* Table Header & Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <h3 className="font-bold text-lg text-slate-900 tracking-tight">User Account Directory</h3>
+          <p className="text-xs text-slate-500">Registered platform traveler accounts ({allUser.length})</p>
+        </div>
+
+        <div className="relative w-full sm:w-64">
+          <input
+            type="text"
+            placeholder="Search name, email, phone..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 pl-9 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 font-medium"
+          />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
       </div>
-    </>
+
+      {loading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="h-16 bg-slate-100 rounded-2xl animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className="p-4 bg-red-50 text-red-700 text-xs text-center rounded-xl border border-red-200 font-medium">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && allUser.length === 0 && (
+        <div className="py-12 text-center text-xs text-slate-400 font-medium">
+          No registered user accounts match your search query.
+        </div>
+      )}
+
+      {/* Users Data Table */}
+      {!loading && !error && allUser.length > 0 && (
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm bg-white">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-900 border-b border-slate-800 text-slate-200 font-bold uppercase tracking-wider">
+                <th className="py-3.5 px-4">User</th>
+                <th className="py-3.5 px-4">Contact Email</th>
+                <th className="py-3.5 px-4">Phone Number</th>
+                <th className="py-3.5 px-4">Address</th>
+                <th className="py-3.5 px-4">Role</th>
+                <th className="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {allUser.map((user) => {
+                const isAdmin = user.user_role === 1;
+
+                return (
+                  <tr key={user._id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                        {user.username?.[0] || "U"}
+                      </div>
+                      <span>{user.username}</span>
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-700 font-medium">{user.email}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{user.phone || "—"}</td>
+                    <td className="py-3.5 px-4 text-slate-600 truncate max-w-[150px]">{user.address || "—"}</td>
+                    <td className="py-3.5 px-4">
+                      {isAdmin ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-200">
+                          <Shield className="w-3 h-3 text-amber-600" /> Admin
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200">
+                          Traveler
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <button
+                        onClick={() => handleUserDelete(user._id)}
+                        disabled={loading}
+                        className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                        title="Delete User Account"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+    </div>
   );
 };
 
