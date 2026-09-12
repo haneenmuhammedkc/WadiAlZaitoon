@@ -16,17 +16,44 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: String,
-      default: "",
+      streetAddress: {
+        type: String,
+        default: "",
+      },
+      apartment: {
+        type: String,
+        default: "",
+      },
+      city: {
+        type: String,
+        default: "",
+      },
+      state: {
+        type: String,
+        default: "",
+      },
+      postalCode: {
+        type: String,
+        default: "",
+      },
+      country: {
+        type: String,
+        default: "",
+      },
+      customField: {
+        name: {
+          type: String,
+          default: "",
+        },
+        value: {
+          type: String,
+          default: "",
+        },
+      },
     },
     phone: {
       type: String,
       default: "",
-    },
-    avatar: {
-      type: String,
-      default:
-        "https://firebasestorage.googleapis.com/v0/b/mern-travel-tourism.appspot.com/o/profile-photos%2F1706415975072defaultProfileImgttms125.png?alt=media&token=7f309b9e-7ccf-4a15-ba5c-829c9952a85c",
     },
     user_role: {
       type: Number,

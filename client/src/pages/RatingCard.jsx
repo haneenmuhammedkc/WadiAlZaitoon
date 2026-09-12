@@ -1,12 +1,11 @@
 import { Rating } from "@mui/material";
 import React from "react";
-import defaultProfileImg from "../assets/images/profile.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Quote } from "lucide-react";
+import { Quote, User } from "lucide-react";
 
 const RatingCard = ({ ratingData }) => {
   if (!ratingData || ratingData.length === 0) {
@@ -48,14 +47,12 @@ const RatingCard = ({ ratingData }) => {
             </div>
 
             <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
-              <img
-                src={rate.user?.avatar || defaultProfileImg}
-                alt={rate.user?.username || "Traveler"}
-                className="w-10 h-10 rounded-full object-cover border border-slate-200"
-              />
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0">
+                <User className="w-4 h-4 text-slate-500" />
+              </div>
               <div>
                 <h4 className="font-bold text-sm text-slate-900">
-                  {rate.user?.username || "Guest Traveler"}
+                  {rate.username || rate.user?.username || "Guest Traveler"}
                 </h4>
                 <span className="text-[10px] text-slate-400 font-medium block">Verified Customer</span>
               </div>

@@ -12,37 +12,35 @@ import {
   Hotel as HotelIcon,
   LogOut,
   X,
+  User,
 } from "lucide-react";
 
 const navGroups = [
   {
     group: "OVERVIEW",
     items: [
-      { id: 0, label: "Dashboard", icon: LayoutDashboard },
+      { id: 0, label: "Command Overview", icon: LayoutDashboard },
+      { id: 1, label: "Add Tour Package", icon: PlusCircle },
     ],
   },
   {
     group: "OPERATIONS",
     items: [
-      { id: 1, label: "Bookings", icon: LayoutDashboard },
-      { id: 3, label: "Packages", icon: Package },
-      { id: 2, label: "Add Package", icon: PlusCircle },
-      { id: 9, label: "Hotels", icon: HotelIcon },
+      { id: 2, label: "Package Inventory", icon: Package },
+      { id: 3, label: "Hotel Directory", icon: HotelIcon },
+      { id: 6, label: "Booking Ledger", icon: Clock },
     ],
   },
   {
     group: "COMMUNITY",
     items: [
-      { id: 4, label: "Users", icon: Users },
-      { id: 6, label: "Reviews", icon: Star },
+      { id: 4, label: "User Accounts", icon: Users },
+      { id: 7, label: "Reviews & Ratings", icon: Star },
     ],
   },
   {
     group: "FINANCIALS",
-    items: [
-      { id: 5, label: "Payments & Refunds", icon: CreditCard },
-      { id: 7, label: "History Log", icon: Clock },
-    ],
+    items: [{ id: 5, label: "Revenue & Refunds", icon: CreditCard }],
   },
 ];
 
@@ -52,19 +50,9 @@ const AdminSidebar = ({
   mobileSidebarOpen = false,
   setMobileSidebarOpen,
   currentUser,
-  profilePhoto,
-  avatarUrl,
-  fileRef,
-  onProfilePhotoChange,
   onLogout,
   onDeleteAccount,
 }) => {
-  const displayAvatar =
-    (profilePhoto && URL.createObjectURL(profilePhoto)) ||
-    avatarUrl ||
-    currentUser?.avatar ||
-    "/assets/images/profile.png";
-
   const closeMobileSidebar = () => {
     if (setMobileSidebarOpen) setMobileSidebarOpen(false);
   };
@@ -126,21 +114,8 @@ const AdminSidebar = ({
         <div className="p-4 border-t border-slate-800 bg-slate-950/50">
           <div className="flex items-center justify-between p-2">
             <div className="flex items-center gap-2.5">
-              <div className="relative group cursor-pointer" onClick={() => fileRef?.current?.click()}>
-                <img
-                  src={displayAvatar}
-                  alt={currentUser?.username || "Admin"}
-                  className="w-9 h-9 rounded-full object-cover border border-slate-700"
-                />
-                {fileRef && (
-                  <input
-                    type="file"
-                    ref={fileRef}
-                    hidden
-                    accept="image/*"
-                    onChange={(e) => onProfilePhotoChange && e.target.files[0] && onProfilePhotoChange(e.target.files[0])}
-                  />
-                )}
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                <User className="w-4 h-4" />
               </div>
               <div>
                 <span className="font-bold text-xs text-white block truncate max-w-[110px]">

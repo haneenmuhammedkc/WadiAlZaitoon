@@ -11,7 +11,6 @@ import VerifyEmail from "../pages/auth/VerifyEmail";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import VerifyResetOtp from "../pages/auth/VerifyResetOtp";
 import ResetPassword from "../pages/auth/ResetPassword";
-import PasswordResetSuccess from "../pages/auth/PasswordResetSuccess";
 
 import Home from "../pages/landing/Home";
 import Hotels from "../pages/hotel/Hotels";
@@ -49,7 +48,6 @@ const AppRoutes = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
         </Route>
 
         {/* PUBLIC WEBSITE ROUTES (Wrapped in PublicLayout with Header & Footer) */}

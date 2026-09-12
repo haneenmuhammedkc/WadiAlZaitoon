@@ -174,7 +174,6 @@ const PackageDetails = () => {
     packageId: params?.id,
     userRef: currentUser?._id,
     username: currentUser?.username,
-    userProfileImg: currentUser?.avatar,
   });
   const [packageRatings, setPackageRatings] = useState([]);
   const [ratingGiven, setRatingGiven] = useState(false);
@@ -373,7 +372,7 @@ const PackageDetails = () => {
               <div class="subtitle">Wadi Al Zaitoon Tourism • ${packageData.packageDestination}</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 24px; font-weight: 900; color: #0f172a;">$${hasOffer ? packageData.packageDiscountPrice : packageData.packagePrice}</div>
+              <div style="font-size: 24px; font-weight: 900; color: #0f172a;">₹${hasOffer ? packageData.packageDiscountPrice : packageData.packagePrice}</div>
               <div style="font-size: 11px; color: #64748b;">Starting Price / Person</div>
             </div>
           </div>

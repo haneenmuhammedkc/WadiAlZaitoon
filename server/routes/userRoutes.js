@@ -3,7 +3,6 @@ import {
   deleteUserAccount,
   deleteUserAccountAdmin,
   getAllUsers,
-  updateProfilePhoto,
   updateUser,
   updateUserPassword,
 } from "../controllers/userController.js";
@@ -23,9 +22,6 @@ router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
 
 //update user details
 router.post("/update/:id", requireSignIn, updateUser);
-
-//update user profile photo
-router.post("/update-profile-photo/:id", requireSignIn, updateProfilePhoto);
 
 //update user password
 router.post("/update-password/:id", requireSignIn, updateUserPassword);

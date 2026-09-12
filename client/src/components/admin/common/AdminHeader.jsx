@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Bell, LogOut } from "lucide-react";
+import { Menu, Bell, LogOut, User } from "lucide-react";
 
 const AdminHeader = ({
   currentMeta = { title: "Command Portal", desc: "Wadi Al Zaitoon Management System" },
@@ -7,16 +7,8 @@ const AdminHeader = ({
   onToggleMobileSidebar,
   setActivePanelId,
   currentUser,
-  profilePhoto,
-  avatarUrl,
   onLogout,
 }) => {
-  const displayAvatar =
-    (profilePhoto && URL.createObjectURL(profilePhoto)) ||
-    avatarUrl ||
-    currentUser?.avatar ||
-    "/assets/images/profile.png";
-
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm h-16 flex items-center px-4 sm:px-8 justify-between">
       <div className="flex items-center gap-4">
@@ -57,11 +49,9 @@ const AdminHeader = ({
           onClick={() => setActivePanelId && setActivePanelId(8)}
           className="flex items-center gap-2.5 cursor-pointer p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
         >
-          <img
-            src={displayAvatar}
-            alt={currentUser?.username || "Admin"}
-            className="w-8 h-8 rounded-full object-cover border border-slate-200"
-          />
+          <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+            <User className="w-4 h-4" />
+          </div>
           <div className="hidden sm:block text-left">
             <span className="font-bold text-xs text-slate-900 block leading-tight">
               {currentUser?.username}

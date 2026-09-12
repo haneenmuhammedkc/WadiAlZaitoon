@@ -16,7 +16,6 @@ const AdminUpdateProfile = () => {
     username: "",
     address: "",
     phone: "",
-    avatar: "",
   });
   const [updatePassword, setUpdatePassword] = useState({
     oldpassword: "",
@@ -29,7 +28,6 @@ const AdminUpdateProfile = () => {
         username: currentUser.username || "",
         address: currentUser.address || "",
         phone: currentUser.phone || "",
-        avatar: currentUser.avatar || "",
       });
     }
   }, [currentUser]);

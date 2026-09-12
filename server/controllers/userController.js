@@ -21,16 +21,67 @@ export const updateUser = async (req, res, next) => {
 
     const { username, email, address, phone } = req.body;
 
+    const updateFields = {};
+    if (username !== undefined) updateFields.username = String(username).trim();
+    if (email !== undefined) updateFields.email = String(email).toLowerCase().trim();
+    if (phone !== undefined) updateFields.phone = String(phone).trim();
+
+    if (address !== undefined) {
+      let addrObj = address;
+      if (typeof addrObj === "string") {
+        const trimmed = addrObj.trim();
+        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+          try {
+            addrObj = JSON.parse(trimmed);
+          } catch {
+            addrObj = { streetAddress: trimmed };
+          }
+        } else {
+          addrObj = { streetAddress: trimmed };
+        }
+      }
+
+      if (!addrObj || typeof addrObj !== "object") {
+        addrObj = {};
+      }
+
+      const streetAddress = addrObj.streetAddress ? String(addrObj.streetAddress).trim() : "";
+      const apartment = addrObj.apartment ? String(addrObj.apartment).trim() : "";
+      const city = addrObj.city ? String(addrObj.city).trim() : "";
+      const state = addrObj.state ? String(addrObj.state).trim() : "";
+      const postalCode = addrObj.postalCode ? String(addrObj.postalCode).trim() : "";
+      const country = addrObj.country ? String(addrObj.country).trim() : "";
+
+      let customName = addrObj.customField?.name
+        ? String(addrObj.customField.name).trim().slice(0, 50)
+        : "";
+      let customVal = addrObj.customField?.value
+        ? String(addrObj.customField.value).trim().slice(0, 250)
+        : "";
+
+      // Normalize customField: only active if both name and value are present
+      if (!customName || !customVal) {
+        customName = "";
+        customVal = "";
+      }
+
+      updateFields.address = {
+        streetAddress,
+        apartment,
+        city,
+        state,
+        postalCode,
+        country,
+        customField: {
+          name: customName,
+          value: customVal,
+        },
+      };
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      {
-        $set: {
-          username: username ? String(username).trim() : undefined,
-          email: email ? String(email).toLowerCase().trim() : undefined,
-          address: address ? String(address).trim() : undefined,
-          phone: phone ? String(phone).trim() : undefined,
-        },
-      },
+      { $set: updateFields },
       { new: true, runValidators: true }
     );
 
@@ -59,58 +110,7 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
-//update user profile photo
-export const updateProfilePhoto = async (req, res, next) => {
-  try {
-    if (!isValidObjectId(req.params.id)) {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid user ID format!",
-      });
-    }
 
-    if (String(req.user._id) !== String(req.params.id)) {
-      return res.status(403).send({
-        success: false,
-        message: "You can only update your own profile photo!",
-      });
-    }
-
-    if (!req.body.avatar || typeof req.body.avatar !== "string") {
-      return res.status(400).send({
-        success: false,
-        message: "Avatar URL is required!",
-      });
-    }
-
-    const updatedProfilePhoto = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          avatar: req.body.avatar,
-        },
-      },
-      { new: true }
-    );
-
-    if (!updatedProfilePhoto) {
-      return res.status(404).send({
-        success: false,
-        message: "User not found!",
-      });
-    }
-
-    const { password: pass, ...rest } = updatedProfilePhoto._doc;
-
-    return res.status(200).send({
-      success: true,
-      message: "Profile photo updated",
-      user: rest,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
 // update user password
 export const updateUserPassword = async (req, res, next) => {

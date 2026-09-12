@@ -42,7 +42,6 @@ export const giveRating = async (req, res, next) => {
       packageId: String(packageId),
       userRef: String(req.user._id),
       username: req.user.username,
-      userProfileImg: req.user.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
     });
 
     if (newRating) {

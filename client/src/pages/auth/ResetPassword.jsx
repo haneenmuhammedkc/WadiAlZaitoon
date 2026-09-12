@@ -54,11 +54,12 @@ const ResetPassword = () => {
       }
 
       setLoading(false);
-      setSuccessMsg("Password reset successfully! Redirecting...");
+      setSuccessMsg("Password reset successfully! Redirecting to sign in...");
 
       setTimeout(() => {
-        navigate("/password-reset-success", {
+        navigate("/login", {
           replace: true,
+          state: { message: "Password reset successfully. Please sign in with your new password." },
         });
       }, 1000);
     } catch (err) {

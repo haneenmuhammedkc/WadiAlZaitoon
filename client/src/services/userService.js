@@ -12,15 +12,6 @@ export const updateProfile = async (userId, userData) => {
   }
 };
 
-export const updateProfilePhoto = async (userId, photoData) => {
-  try {
-    const res = await axiosInstance.post(`/user/update-profile-photo/${userId}`, photoData);
-    return res.data;
-  } catch (error) {
-    return error.response?.data || { success: false, message: error.message };
-  }
-};
-
 export const updatePassword = async (userId, passwordData) => {
   try {
     const res = await axiosInstance.post(`/user/update-password/${userId}`, passwordData);
@@ -77,7 +68,6 @@ export const checkAdminAuth = async () => {
 
 export default {
   updateProfile,
-  updateProfilePhoto,
   updatePassword,
   deleteUser,
   getAllUsers,
