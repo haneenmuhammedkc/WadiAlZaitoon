@@ -17,9 +17,21 @@ const app = express();
 
 app.use(helmet());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://wadi-al-zaitoon.vercel.app",
+  process.env.SERVER_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.SERVER_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );

@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
       user,
       currentUser: user, // Alias for 100% drop-in compatibility with components reading currentUser
       isAuthenticated: !!user,
-      isAdmin: user?.user_role === "admin",
+      isAdmin: user?.user_role === 1 || user?.user_role === "admin",
       loading,
       error,
       login,

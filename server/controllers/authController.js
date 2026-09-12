@@ -182,6 +182,7 @@ export const loginController = async (req, res, next) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 4 * 24 * 60 * 60 * 1000,
+      path: "/",
     };
 
     res
@@ -204,6 +205,7 @@ export const logOutController = (req, res, next) => {
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
     res.status(200).send({
       success: true,

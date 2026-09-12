@@ -200,6 +200,7 @@ export const deleteUserAccount = async (req, res, next) => {
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
     return res.status(200).send({
       success: true,

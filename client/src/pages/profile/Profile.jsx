@@ -470,7 +470,7 @@ const Profile = () => {
                   onClick={handleLogout}
                   className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2"
                 >
-                  Log out
+                  LOG OUT
                 </button>
               </div>
             </div>
