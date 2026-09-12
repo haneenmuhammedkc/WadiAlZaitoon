@@ -47,13 +47,53 @@ export const signupController = async (req, res, next) => {
       });
     }
 
+    const normalizeSignupAddress = (raw) => {
+      const empty = {
+        streetAddress: "",
+        apartment: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+        customField: { name: "", value: "" },
+      };
+      if (!raw) return empty;
+      if (typeof raw === "object") {
+        return {
+          streetAddress: raw.streetAddress ? String(raw.streetAddress).trim() : "",
+          apartment: raw.apartment ? String(raw.apartment).trim() : "",
+          city: raw.city ? String(raw.city).trim() : "",
+          state: raw.state ? String(raw.state).trim() : "",
+          postalCode: raw.postalCode ? String(raw.postalCode).trim() : "",
+          country: raw.country ? String(raw.country).trim() : "",
+          customField: {
+            name: raw.customField?.name ? String(raw.customField.name).trim().slice(0, 50) : "",
+            value: raw.customField?.value ? String(raw.customField.value).trim().slice(0, 250) : "",
+          },
+        };
+      }
+      if (typeof raw === "string") {
+        const trimmed = raw.trim();
+        if (!trimmed || trimmed === "[object Object]") return empty;
+        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+          try {
+            return normalizeSignupAddress(JSON.parse(trimmed));
+          } catch {
+            return { ...empty, streetAddress: trimmed };
+          }
+        }
+        return { ...empty, streetAddress: trimmed };
+      }
+      return empty;
+    };
+
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
     if (userExists && userExists.isEmailVerified === false) {
       // Re-initialize unverified user account
       userExists.username = String(username).trim();
       userExists.password = hashedPassword;
-      userExists.address = req.body.address ? String(req.body.address).trim() : "";
+      userExists.address = normalizeSignupAddress(req.body.address);
       userExists.phone = req.body.phone ? String(req.body.phone).trim() : "";
       await userExists.save();
     } else {
@@ -61,7 +101,7 @@ export const signupController = async (req, res, next) => {
         username: String(username).trim(),
         email: normalizedEmail,
         password: hashedPassword,
-        address: req.body.address ? String(req.body.address).trim() : "",
+        address: normalizeSignupAddress(req.body.address),
         phone: req.body.phone ? String(req.body.phone).trim() : "",
         isEmailVerified: false,
       });

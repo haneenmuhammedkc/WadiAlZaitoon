@@ -30,7 +30,9 @@ export const updateUser = async (req, res, next) => {
       let addrObj = address;
       if (typeof addrObj === "string") {
         const trimmed = addrObj.trim();
-        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+        if (!trimmed || trimmed === "[object Object]") {
+          addrObj = {};
+        } else if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
           try {
             addrObj = JSON.parse(trimmed);
           } catch {
@@ -45,7 +47,8 @@ export const updateUser = async (req, res, next) => {
         addrObj = {};
       }
 
-      const streetAddress = addrObj.streetAddress ? String(addrObj.streetAddress).trim() : "";
+      const rawStreet = addrObj.streetAddress ? String(addrObj.streetAddress).trim() : "";
+      const streetAddress = rawStreet === "[object Object]" ? "" : rawStreet;
       const apartment = addrObj.apartment ? String(addrObj.apartment).trim() : "";
       const city = addrObj.city ? String(addrObj.city).trim() : "";
       const state = addrObj.state ? String(addrObj.state).trim() : "";

@@ -24,9 +24,18 @@ const AdminUpdateProfile = () => {
 
   useEffect(() => {
     if (currentUser !== null) {
+      let addrStr = "";
+      if (typeof currentUser.address === "string") {
+        addrStr = currentUser.address === "[object Object]" ? "" : currentUser.address;
+      } else if (typeof currentUser.address === "object" && currentUser.address !== null) {
+        addrStr =
+          currentUser.address.streetAddress && currentUser.address.streetAddress !== "[object Object]"
+            ? currentUser.address.streetAddress
+            : "";
+      }
       setFormData({
         username: currentUser.username || "",
-        address: currentUser.address || "",
+        address: addrStr,
         phone: currentUser.phone || "",
       });
     }

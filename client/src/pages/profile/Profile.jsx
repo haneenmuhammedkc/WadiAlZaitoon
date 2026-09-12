@@ -80,7 +80,7 @@ const parseAddressData = (rawAddress) => {
   let parsed = rawAddress;
   if (typeof rawAddress === "string") {
     const trimmed = rawAddress.trim();
-    if (!trimmed) return emptyAddress;
+    if (!trimmed || trimmed === "[object Object]") return emptyAddress;
     if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
       try {
         parsed = JSON.parse(trimmed);
@@ -96,11 +96,14 @@ const parseAddressData = (rawAddress) => {
     return emptyAddress;
   }
 
+  const rawStreet = parsed.streetAddress ? String(parsed.streetAddress).trim() : "";
+  const cleanStreet = rawStreet === "[object Object]" ? "" : rawStreet;
+
   const customName = parsed.customField?.name ? String(parsed.customField.name).trim() : "";
   const customVal = parsed.customField?.value ? String(parsed.customField.value).trim() : "";
 
   return {
-    streetAddress: parsed.streetAddress ? String(parsed.streetAddress).trim() : "",
+    streetAddress: cleanStreet,
     apartment: parsed.apartment ? String(parsed.apartment).trim() : "",
     city: parsed.city ? String(parsed.city).trim() : "",
     state: parsed.state ? String(parsed.state).trim() : "",
@@ -850,7 +853,9 @@ const Profile = () => {
                           if (!hasStandard && !hasCustom) {
                             return (
                               <p className="font-bold text-slate-900 text-sm">
-                                {typeof currentUser.address === "string" ? currentUser.address : "No address provided"}
+                                {typeof currentUser.address === "string" && currentUser.address !== "[object Object]"
+                                  ? currentUser.address
+                                  : "No address provided"}
                               </p>
                             );
                           }
