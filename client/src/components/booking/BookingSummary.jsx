@@ -1,6 +1,7 @@
 import React from "react";
 import { useBooking } from "../../pages/booking/BookingContext";
-import { MapPin, Clock, Calendar, Users, Hotel as HotelIcon, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { MapPin, Clock, Calendar, Users, Hotel as HotelIcon, ShieldCheck, CheckCircle2, Compass } from "lucide-react";
+import { TRIP_TYPE_LABELS } from "../../constants/booking.constants";
 
 const BookingSummary = () => {
   const { packageData, bookingState, calculateTotals } = useBooking();
@@ -57,12 +58,22 @@ const BookingSummary = () => {
       <div className="space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-700">
         <div className="flex items-center justify-between">
           <span className="text-slate-500 flex items-center gap-1 text-[11px]">
+            <Compass className="w-3.5 h-3.5 text-slate-400" /> Trip Type
+          </span>
+          <span className="font-semibold text-slate-900 text-[11px]">
+            {TRIP_TYPE_LABELS[bookingState.tripType] || "Couple Trip"}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-slate-500 flex items-center gap-1 text-[11px]">
             <Calendar className="w-3.5 h-3.5 text-slate-400" /> Travel Dates
           </span>
           <span className="font-semibold text-slate-900 text-[11px]">
             {formattedDeparture} - {formattedReturn}
           </span>
         </div>
+
 
         <div className="flex items-center justify-between">
           <span className="text-slate-500 flex items-center gap-1 text-[11px]">

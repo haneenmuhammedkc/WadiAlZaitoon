@@ -211,9 +211,15 @@ const Hotels = () => {
                             >
                               {hotel.hotelName}
                             </h3>
-                            <span className="text-[11px] font-bold text-slate-400 block">
-                              Package: {hotel.packageName}
-                            </span>
+                            {hotel.usedByPackages && hotel.usedByPackages.length > 0 ? (
+                              <span className="text-[11px] font-bold text-emerald-700 block truncate">
+                                Available in: {hotel.usedByPackages.map((p) => p.packageName).join(", ")}
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-bold text-slate-400 block">
+                                Standalone Accommodation
+                              </span>
+                            )}
                           </div>
 
                           {/* Stay Specs Strip */}

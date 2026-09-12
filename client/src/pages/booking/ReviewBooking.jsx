@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { CheckCircle2, Edit3, MapPin, Calendar, Users, Hotel as HotelIcon, Sparkles, User, ShieldCheck, ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
+import { TRIP_TYPE_LABELS } from "../../constants/booking.constants";
 
 const ReviewBooking = () => {
   const navigate = useNavigate();
@@ -52,17 +53,10 @@ const ReviewBooking = () => {
 
       {/* SECTION 1: PACKAGE SUMMARY */}
       <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div className="border-b border-slate-100 pb-2">
           <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900">
             1. Package Itinerary
           </h3>
-          <button
-            type="button"
-            onClick={() => navigate(`/booking/${packageId}/travel`)}
-            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1"
-          >
-            <Edit3 className="w-3.5 h-3.5" /> Edit
-          </button>
         </div>
 
         <div className="flex items-center gap-4">
@@ -89,14 +83,18 @@ const ReviewBooking = () => {
           </h3>
           <button
             type="button"
-            onClick={() => navigate(`/booking/${packageId}/travel`)}
-            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1"
+            onClick={() => navigate(`/booking/${packageId}/travel`, { state: { fromReview: true } })}
+            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-xs">
+          <div>
+            <span className="text-slate-400 font-medium block">Trip Type</span>
+            <span className="font-bold text-slate-900">{TRIP_TYPE_LABELS[bookingState.tripType] || "Couple Trip"}</span>
+          </div>
           <div>
             <span className="text-slate-400 font-medium block">Departure</span>
             <span className="font-bold text-slate-900">{formattedDeparture}</span>
@@ -126,8 +124,8 @@ const ReviewBooking = () => {
           </h3>
           <button
             type="button"
-            onClick={() => navigate(`/booking/${packageId}/hotel`)}
-            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1"
+            onClick={() => navigate(`/booking/${packageId}/hotel`, { state: { fromReview: true } })}
+            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>
@@ -151,8 +149,8 @@ const ReviewBooking = () => {
           </h3>
           <button
             type="button"
-            onClick={() => navigate(`/booking/${packageId}/add-ons`)}
-            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1"
+            onClick={() => navigate(`/booking/${packageId}/add-ons`, { state: { fromReview: true } })}
+            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>
@@ -182,8 +180,8 @@ const ReviewBooking = () => {
           </h3>
           <button
             type="button"
-            onClick={() => navigate(`/booking/${packageId}/travellers`)}
-            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1"
+            onClick={() => navigate(`/booking/${packageId}/travellers`, { state: { fromReview: true } })}
+            className="text-xs font-bold text-emerald-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>

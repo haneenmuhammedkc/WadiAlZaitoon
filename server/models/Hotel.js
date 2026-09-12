@@ -7,16 +7,6 @@ const hotelSchema = new mongoose.Schema(
       required: [true, "Hotel name is required"],
       trim: true,
     },
-    packageName: {
-      type: String,
-      trim: true,
-      default: "",
-    },
-    packageId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Package",
-      default: null,
-    },
     location: {
       type: String,
       required: [true, "Hotel location is required"],

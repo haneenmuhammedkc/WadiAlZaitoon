@@ -26,6 +26,10 @@ const UpdatePackage = () => {
     packageTotalRatings: 0,
     packageImages: [],
     hotel: "",
+    itinerary: [],
+    inclusionsStr: "",
+    exclusionsStr: "",
+    faqs: [],
   });
   const [hotelsList, setHotelsList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,6 +56,23 @@ const UpdatePackage = () => {
       if (data?.success) {
         const pkg = data.packageData;
         const hotelId = pkg?.hotel?._id || pkg?.hotel || "";
+
+        const rawItinerary = Array.isArray(pkg?.itinerary) ? pkg.itinerary : [];
+        const normalizedItinerary = rawItinerary.map((item, idx) => ({
+          day: typeof item?.day === "number" ? item.day : idx + 1,
+          title: item?.title || "",
+          description: item?.description || "",
+        }));
+
+        const rawFaqs = Array.isArray(pkg?.faqs) ? pkg.faqs : [];
+        const normalizedFaqs = rawFaqs.map((faq) => ({
+          question: faq?.question || faq?.q || "",
+          answer: faq?.answer || faq?.a || "",
+        }));
+
+        const rawInclusions = Array.isArray(pkg?.inclusions) ? pkg.inclusions : [];
+        const rawExclusions = Array.isArray(pkg?.exclusions) ? pkg.exclusions : [];
+
         setFormData({
           packageName: pkg?.packageName || "",
           packageDescription: pkg?.packageDescription || "",
@@ -66,8 +87,13 @@ const UpdatePackage = () => {
           packageDiscountPrice: pkg?.packageDiscountPrice || 0,
           packageOffer: pkg?.packageOffer || false,
           packageRating: pkg?.packageRating || 0,
-          packageImages: pkg?.packageImages || [],
+          packageTotalRatings: pkg?.packageTotalRatings || 0,
+          packageImages: Array.isArray(pkg?.packageImages) ? pkg.packageImages : [],
           hotel: hotelId,
+          itinerary: normalizedItinerary,
+          inclusionsStr: rawInclusions.join("\n"),
+          exclusionsStr: rawExclusions.join("\n"),
+          faqs: normalizedFaqs,
         });
       } else {
         setError(data?.message || "Failed to fetch package data");
@@ -117,7 +143,25 @@ const UpdatePackage = () => {
       setLoading(true);
       setError(false);
 
-      const data = await updatePackage(params?.id, formData);
+      const payload = {
+        ...formData,
+        inclusions: formData.inclusionsStr
+          ? formData.inclusionsStr.split("\n").map((s) => s.trim()).filter(Boolean)
+          : [],
+        exclusions: formData.exclusionsStr
+          ? formData.exclusionsStr.split("\n").map((s) => s.trim()).filter(Boolean)
+          : [],
+        itinerary: Array.isArray(formData.itinerary)
+          ? formData.itinerary.map((item, idx) => ({
+              day: typeof item?.day === "number" ? item.day : idx + 1,
+              title: String(item?.title || "").trim(),
+              description: String(item?.description || "").trim(),
+            }))
+          : [],
+        faqs: Array.isArray(formData.faqs) ? formData.faqs : [],
+      };
+
+      const data = await updatePackage(params?.id, payload);
 
       if (data?.success) {
         setLoading(false);
@@ -342,7 +386,7 @@ const UpdatePackage = () => {
             {/* SECTION 2: DESCRIPTION & ITINERARY */}
             <div className="space-y-4 pt-4 border-t border-slate-200">
               <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
-                2. Overview & Custom Inclusions
+                3. Overview & Custom Inclusions
               </h4>
 
               <div className="space-y-4">
@@ -365,7 +409,7 @@ const UpdatePackage = () => {
             {/* SECTION 3: PRICING & LOGISTICS */}
             <div className="space-y-4 pt-4 border-t border-slate-200">
               <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
-                3. Rates & Duration
+                4. Rates & Duration
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -432,6 +476,218 @@ const UpdatePackage = () => {
                 packageImages={formData.packageImages}
                 onChange={(newImages) => setFormData({ ...formData, packageImages: newImages })}
               />
+            </div>
+
+            {/* SECTION 5: DETAILED CONTENT (INCLUSIONS, EXCLUSIONS, ITINERARY, FAQS) */}
+            <div className="space-y-6 pt-4 border-t border-slate-200">
+              <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+                5. Public Package Details Content
+              </h4>
+
+              {/* Inclusions & Exclusions Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label htmlFor="inclusionsStr" className="text-xs font-semibold text-slate-700">
+                    Package Inclusions (One per line)
+                  </label>
+                  <textarea
+                    id="inclusionsStr"
+                    rows={4}
+                    placeholder="e.g. 5 Nights Accommodation&#10;Daily Breakfast&#10;Private Airport Transfer"
+                    value={formData.inclusionsStr || ""}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400 font-medium"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label htmlFor="exclusionsStr" className="text-xs font-semibold text-slate-700">
+                    Package Exclusions (One per line)
+                  </label>
+                  <textarea
+                    id="exclusionsStr"
+                    rows={4}
+                    placeholder="e.g. International Airfare&#10;Personal Expenses & Tips&#10;Travel Insurance"
+                    value={formData.exclusionsStr || ""}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-slate-400 font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Day-by-Day Itinerary Builder */}
+              <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span className="text-xs font-bold text-slate-900 uppercase">
+                    Day-by-Day Itinerary ({(formData.itinerary || []).length} Days Configured)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => {
+                        const currentItinerary = Array.isArray(prev.itinerary) ? prev.itinerary : [];
+                        const nextDayNum = currentItinerary.length + 1;
+                        return {
+                          ...prev,
+                          itinerary: [
+                            ...currentItinerary,
+                            { day: nextDayNum, title: `Day ${nextDayNum} Highlights`, description: "" },
+                          ],
+                        };
+                      });
+                    }}
+                    className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold"
+                  >
+                    + Add Day
+                  </button>
+                </div>
+
+                {!(formData.itinerary && formData.itinerary.length > 0) ? (
+                  <p className="text-[11px] text-slate-500 italic py-2">
+                    No custom day-by-day itinerary days configured yet. Click "+ Add Day" to create custom daily itineraries.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.itinerary.map((item, idx) => (
+                      <div key={idx} className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-3">
+                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5">
+                          <span className="text-[11px] font-black text-emerald-700 uppercase tracking-wide">
+                            Day {item.day || idx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                itinerary: (prev.itinerary || []).filter((_, i) => i !== idx),
+                              }));
+                            }}
+                            className="text-[10px] text-red-500 font-semibold hover:underline"
+                          >
+                            Remove Day
+                          </button>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-slate-700">Day Title</label>
+                          <input
+                            type="text"
+                            placeholder="Day Title (e.g. Arrival & Desert Safari)"
+                            value={item.title || ""}
+                            onChange={(e) => {
+                              const newVal = e.target.value;
+                              setFormData((prev) => {
+                                const updated = [...(prev.itinerary || [])];
+                                updated[idx] = { ...updated[idx], title: newVal };
+                                return { ...prev, itinerary: updated };
+                              });
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-slate-400"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-slate-700">Description</label>
+                          <textarea
+                            rows={2}
+                            placeholder="Day description and itinerary details..."
+                            value={item.description || ""}
+                            onChange={(e) => {
+                              const newVal = e.target.value;
+                              setFormData((prev) => {
+                                const updated = [...(prev.itinerary || [])];
+                                updated[idx] = { ...updated[idx], description: newVal };
+                                return { ...prev, itinerary: updated };
+                              });
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 resize-none focus:outline-none focus:border-slate-400"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* FAQs Builder */}
+              <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <span className="text-xs font-bold text-slate-900 uppercase">
+                    Package FAQs ({(formData.faqs || []).length} Q&As)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => {
+                        const currentFaqs = Array.isArray(prev.faqs) ? prev.faqs : [];
+                        return {
+                          ...prev,
+                          faqs: [...currentFaqs, { question: "", answer: "" }],
+                        };
+                      });
+                    }}
+                    className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold"
+                  >
+                    + Add FAQ
+                  </button>
+                </div>
+
+                {!(formData.faqs && formData.faqs.length > 0) ? (
+                  <p className="text-[11px] text-slate-500 italic py-2">
+                    No custom FAQs configured yet. Click "+ Add FAQ" to create custom package Q&A pairs.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.faqs.map((faq, idx) => (
+                      <div key={idx} className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-700">FAQ #{idx + 1}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                faqs: (prev.faqs || []).filter((_, i) => i !== idx),
+                              }));
+                            }}
+                            className="text-[10px] text-red-500 font-semibold hover:underline"
+                          >
+                            Remove FAQ
+                          </button>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="Question (e.g. What is the dress code for safari?)"
+                          value={faq.question || ""}
+                          onChange={(e) => {
+                            const newVal = e.target.value;
+                            setFormData((prev) => {
+                              const updated = [...(prev.faqs || [])];
+                              updated[idx] = { ...updated[idx], question: newVal };
+                              return { ...prev, faqs: updated };
+                            });
+                          }}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-800"
+                        />
+                        <textarea
+                          rows={2}
+                          placeholder="Answer..."
+                          value={faq.answer || ""}
+                          onChange={(e) => {
+                            const newVal = e.target.value;
+                            setFormData((prev) => {
+                              const updated = [...(prev.faqs || [])];
+                              updated[idx] = { ...updated[idx], answer: newVal };
+                              return { ...prev, faqs: updated };
+                            });
+                          }}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 resize-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Submit */}

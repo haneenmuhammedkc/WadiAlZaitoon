@@ -101,7 +101,7 @@ const Header = () => {
           {/* Desktop Actions: BOOK NOW & Profile */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
             <Link
-              to="/packages/all"
+              to="/packages"
               className="px-5 py-2 rounded-full bg-emerald-900 hover:bg-emerald-950 text-white font-extrabold text-[11px] tracking-wider uppercase transition-all shadow-md hover:shadow-lg transform active:scale-95"
             >
               BOOK NOW

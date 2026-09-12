@@ -93,7 +93,8 @@ const HotelDetails = () => {
     );
   }
 
-  const targetPackageId = hotel.packageId || `sample-${hotel.id}`;
+  const primaryPkg = hotel.usedByPackages && hotel.usedByPackages.length > 0 ? hotel.usedByPackages[0] : null;
+  const targetPackageId = primaryPkg?._id;
 
   return (
     <PageTransition>
@@ -135,23 +136,43 @@ const HotelDetails = () => {
                 </div>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-6 shrink-0">
-                <div>
-                  <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider block">
-                    PACKAGE STAY
-                  </span>
-                  <span className="text-sm font-extrabold text-[#0F172A]">
-                    {hotel.packageName}
-                  </span>
+              {primaryPkg ? (
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-6 shrink-0">
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider block">
+                      FEATURED IN
+                    </span>
+                    <span className="text-sm font-extrabold text-[#0F172A]">
+                      {primaryPkg.packageName}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => navigate(`/package/${primaryPkg._id}`)}
+                    className="px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#059669] text-white text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <span>VIEW TOUR</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => navigate(`/package/${targetPackageId}`)}
-                  className="px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#059669] text-white text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
-                >
-                  <span>VIEW TOUR</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              ) : (
+                <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-6 shrink-0">
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider block">
+                      ACCOMMODATION
+                    </span>
+                    <span className="text-sm font-extrabold text-[#0F172A]">
+                      Independent Hotel Stay
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => navigate("/packages")}
+                    className="px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#059669] text-white text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <span>EXPLORE TOURS</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
           </FadeIn>
 
@@ -359,10 +380,10 @@ const HotelDetails = () => {
                   
                   <div className="space-y-2 relative z-10">
                     <span className="text-[11px] uppercase tracking-widest text-[#059669] font-extrabold block">
-                      YOUR JOURNEY INCLUDES
+                      {primaryPkg ? "FEATURED TOUR PACKAGE" : "EXPLORE PACKAGES"}
                     </span>
                     <h3 className="text-2xl font-black tracking-tight text-white">
-                      {hotel.packageName}
+                      {primaryPkg ? primaryPkg.packageName : "Wadi Al Zaitoon Curated Tours"}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed pt-1">
                       Explore the complete tour package, full day-by-day itinerary, inclusions and exclusive travel experiences.
@@ -371,10 +392,10 @@ const HotelDetails = () => {
 
                   <div className="pt-2 relative z-10">
                     <button
-                      onClick={() => navigate(`/package/${targetPackageId}`)}
+                      onClick={() => navigate(targetPackageId ? `/package/${targetPackageId}` : "/packages")}
                       className="w-full py-4 rounded-2xl bg-[#059669] hover:bg-[#047857] text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-lg cursor-pointer"
                     >
-                      <span>VIEW TOUR PACKAGE</span>
+                      <span>{targetPackageId ? "VIEW TOUR PACKAGE" : "BROWSE ALL PACKAGES"}</span>
                       <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>

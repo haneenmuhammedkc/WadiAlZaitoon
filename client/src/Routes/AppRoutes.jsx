@@ -31,7 +31,6 @@ import HotelDetails from "../pages/hotel/HotelDetails";
 import UpdatePackage from "../pages/admin/UpdatePackage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import PackageDetails from "../pages/package/PackageDetails";
-import PackageCollectionPage from "../pages/package/PackageCollectionPage";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -40,7 +39,8 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* STANDALONE AUTHENTICATION ROUTES (Wrapped in AuthLayout with NO Header & NO Footer) */}
+
+        {/* AUTHENTICATION ROUTES */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Register />} />
@@ -50,12 +50,11 @@ const AppRoutes = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
 
-        {/* PUBLIC WEBSITE ROUTES (Wrapped in PublicLayout with Header & Footer) */}
+        {/* PUBLIC ROUTES */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Package />} />
-          <Route path="/packages" element={<PackageCollectionPage />} />
-          <Route path="/packages/all" element={<Package />} />
+          <Route path="/packages" element={<Package />} />
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/hotel/:id" element={<HotelDetails />} />
           <Route path="/reviews" element={<RatingsPage />} />
@@ -84,7 +83,7 @@ const AppRoutes = () => {
           </Route>
         </Route>
 
-        {/* ADMIN APPLICATION ROUTES (NO Public Header / NO Public Footer) */}
+        {/* ADMIN ROUTES */}
         <Route path="/profile" element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="admin" element={<AdminDashboard />} />

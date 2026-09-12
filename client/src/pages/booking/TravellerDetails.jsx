@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { User, ShieldAlert, CheckCircle, ArrowRight, ArrowLeft, Mail, Phone, Lock } from "lucide-react";
 
 const TravellerDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromReview = location.state?.fromReview === true;
+
   const { user: currentUser } = useAuth();
   const { packageId, bookingState, updateTravellerDetails } = useBooking();
 
@@ -82,6 +85,20 @@ const TravellerDetails = () => {
   return (
     <form onSubmit={handleContinue} className="space-y-6 font-sans">
       
+      {/* Review-Edit Banner */}
+      {fromReview && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between shadow-sm">
+          <span>Editing Traveller Details from Review Booking</span>
+          <button
+            type="button"
+            onClick={() => navigate(`/booking/${packageId}/review`)}
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 underline flex items-center gap-1 cursor-pointer"
+          >
+            ← Back to Review Booking
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-slate-200 pb-4">
         <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -91,6 +108,7 @@ const TravellerDetails = () => {
           Enter your details exactly as they appear on your official government passport or ID.
         </p>
       </div>
+
 
       {/* LEAD TRAVELLER FORM */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-sm space-y-5">
@@ -321,18 +339,18 @@ const TravellerDetails = () => {
       <div className="flex items-center justify-between pt-2">
         <button
           type="button"
-          onClick={() => navigate(`/booking/${packageId}/add-ons`)}
-          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
+          onClick={() => navigate(fromReview ? `/booking/${packageId}/review` : `/booking/${packageId}/add-ons`)}
+          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span>{fromReview ? "Back to Review" : "Back"}</span>
         </button>
 
         <button
           type="submit"
           className="px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
         >
-          <span>Continue to Review</span>
+          <span>{fromReview ? "SAVE & RETURN TO REVIEW" : "Continue to Review"}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

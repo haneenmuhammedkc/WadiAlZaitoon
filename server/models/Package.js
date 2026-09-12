@@ -66,7 +66,29 @@ const packageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Hotel",
       default: null,
+      index: true,
     },
+    itinerary: [
+      {
+        day: { type: Number, required: true },
+        title: { type: String, required: true, trim: true },
+        description: { type: String, required: true, trim: true },
+      },
+    ],
+    inclusions: {
+      type: [String],
+      default: [],
+    },
+    exclusions: {
+      type: [String],
+      default: [],
+    },
+    faqs: [
+      {
+        question: { type: String, required: true, trim: true },
+        answer: { type: String, required: true, trim: true },
+      },
+    ],
   },
   { timestamps: true }
 );

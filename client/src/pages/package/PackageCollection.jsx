@@ -235,7 +235,7 @@ const PackageCollection = () => {
 
   const handleCardClick = (e) => {
     if (e) e.preventDefault();
-    navigate("/packages/all");
+    navigate("/packages");
   };
 
   return (

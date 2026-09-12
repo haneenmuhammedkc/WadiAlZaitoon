@@ -1,4 +1,5 @@
 import Package from "../models/Package.js";
+import Hotel from "../models/Hotel.js";
 import { escapeRegex, isValidObjectId } from "../utils/security.js";
 
 //create package
@@ -19,6 +20,10 @@ export const createPackage = async (req, res, next) => {
       packageOffer,
       packageImages,
       hotel,
+      itinerary,
+      inclusions,
+      exclusions,
+      faqs,
     } = req.body;
 
     if (
@@ -66,8 +71,19 @@ export const createPackage = async (req, res, next) => {
     }
 
     let validHotelId = null;
+    let accommodationName = String(packageAccommodation || "").trim();
     if (hotel && isValidObjectId(hotel)) {
+      const hotelExists = await Hotel.findById(hotel);
+      if (!hotelExists) {
+        return res.status(400).send({
+          success: false,
+          message: "Selected hotel does not exist!",
+        });
+      }
       validHotelId = hotel;
+      if (!accommodationName) {
+        accommodationName = hotelExists.hotelName;
+      }
     }
 
     const newPackage = await Package.create({
@@ -76,7 +92,7 @@ export const createPackage = async (req, res, next) => {
       packageDestination: String(packageDestination).trim(),
       packageDays: days,
       packageNights: nights,
-      packageAccommodation: String(packageAccommodation).trim(),
+      packageAccommodation: accommodationName || "Standard Accommodation",
       packageTransportation: String(packageTransportation).trim(),
       packageMeals: String(packageMeals).trim(),
       packageActivities: String(packageActivities).trim(),
@@ -85,6 +101,18 @@ export const createPackage = async (req, res, next) => {
       packageOffer: Boolean(packageOffer),
       packageImages,
       hotel: validHotelId,
+      itinerary: Array.isArray(itinerary)
+        ? itinerary
+            .filter((item) => item && typeof item === "object")
+            .map((item, idx) => ({
+              day: Number(item.day) || idx + 1,
+              title: String(item.title || "").trim(),
+              description: String(item.description || "").trim(),
+            }))
+        : [],
+      inclusions: Array.isArray(inclusions) ? inclusions.map((i) => String(i).trim()).filter(Boolean) : [],
+      exclusions: Array.isArray(exclusions) ? exclusions.map((e) => String(e).trim()).filter(Boolean) : [],
+      faqs: Array.isArray(faqs) ? faqs : [],
     });
 
     if (newPackage) {
@@ -207,6 +235,10 @@ export const updatePackage = async (req, res, next) => {
       "packageOffer",
       "packageImages",
       "hotel",
+      "itinerary",
+      "inclusions",
+      "exclusions",
+      "faqs",
     ];
 
     const updateFields = {};
@@ -214,6 +246,29 @@ export const updatePackage = async (req, res, next) => {
       if (req.body[key] !== undefined) {
         if (key === "hotel") {
           updateFields.hotel = req.body.hotel && isValidObjectId(req.body.hotel) ? req.body.hotel : null;
+        } else if (key === "inclusions" || key === "exclusions") {
+          updateFields[key] = Array.isArray(req.body[key])
+            ? req.body[key].map((item) => String(item).trim()).filter(Boolean)
+            : [];
+        } else if (key === "itinerary") {
+          updateFields.itinerary = Array.isArray(req.body.itinerary)
+            ? req.body.itinerary
+                .filter((item) => item && typeof item === "object")
+                .map((item, idx) => ({
+                  day: Number(item.day) || idx + 1,
+                  title: String(item.title || "").trim(),
+                  description: String(item.description || "").trim(),
+                }))
+            : [];
+        } else if (key === "faqs") {
+          updateFields.faqs = Array.isArray(req.body.faqs)
+            ? req.body.faqs
+                .filter((f) => f && typeof f === "object")
+                .map((f) => ({
+                  question: String(f.question || "").trim(),
+                  answer: String(f.answer || "").trim(),
+                }))
+            : [];
         } else if (key === "packageImages") {
           if (!Array.isArray(req.body.packageImages)) {
             return res.status(400).send({

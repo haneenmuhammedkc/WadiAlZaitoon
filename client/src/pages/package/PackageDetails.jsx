@@ -217,8 +217,17 @@ const PackageDetails = () => {
           packagePrice: data?.packageData?.packagePrice || 500,
           packageDiscountPrice: data?.packageData?.packageDiscountPrice || 0,
           packageOffer: data?.packageData?.packageOffer || false,
-          packageRating: data?.packageData?.packageRating || 4.8,
-          packageTotalRatings: data?.packageData?.packageTotalRatings || 126,
+          hotel: data?.packageData?.hotel || null,
+          itinerary: Array.isArray(data?.packageData?.itinerary)
+            ? data.packageData.itinerary.map((item, idx) => ({
+                day: typeof item?.day === "number" ? item.day : idx + 1,
+                title: item?.title || "",
+                description: item?.description || "",
+              }))
+            : [],
+          inclusions: Array.isArray(data?.packageData?.inclusions) ? data.packageData.inclusions : [],
+          exclusions: Array.isArray(data?.packageData?.exclusions) ? data.packageData.exclusions : [],
+          faqs: Array.isArray(data?.packageData?.faqs) ? data.packageData.faqs : [],
           packageImages:
             data?.packageData?.packageImages && data?.packageData?.packageImages.length > 0
               ? data.packageData.packageImages
@@ -653,7 +662,7 @@ const PackageDetails = () => {
                       </span>
                       {hasOffer && (
                         <span className="text-sm text-slate-400 line-through font-medium">
-                          ${packageData.packagePrice}
+                          ₹{packageData.packagePrice}
                         </span>
                       )}
                       <span className="text-xs text-slate-500 font-medium">/ person</span>
@@ -775,43 +784,36 @@ const PackageDetails = () => {
                         </h3>
                       </div>
 
-                      <div className="space-y-4">
-                        {Array.from({ length: packageData.packageDays || 1 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-extrabold uppercase">
-                                DAY {String(i + 1).padStart(2, "0")}
-                              </span>
-                              <span className="text-xs text-slate-400 font-medium">
-                                {i === 0
-                                  ? "Arrival & Check-in"
-                                  : i === packageData.packageDays - 1
-                                  ? "Departure & Checkout"
-                                  : "Guided Sightseeing"}
-                              </span>
+                      {packageData.itinerary && packageData.itinerary.length > 0 ? (
+                        <div className="space-y-4">
+                          {packageData.itinerary.map((item, i) => (
+                            <div
+                              key={i}
+                              className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-[10px] font-extrabold uppercase">
+                                  DAY {String(item.day || i + 1).padStart(2, "0")}
+                                </span>
+                              </div>
+
+                              <h4 className="font-extrabold text-slate-900 text-sm">
+                                {item.title || `Day ${i + 1}`}
+                              </h4>
+
+                              {item.description && (
+                                <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                                  {item.description}
+                                </p>
+                              )}
                             </div>
-
-                            <h4 className="font-extrabold text-slate-900 text-sm">
-                              {i === 0
-                                ? `Welcome to ${packageData.packageDestination}`
-                                : i === packageData.packageDays - 1
-                                ? "Farewell & Airport Transfer"
-                                : `Exploring ${packageData.packageDestination} Highlights`}
-                            </h4>
-
-                            <p className="text-xs text-slate-600 font-normal leading-relaxed">
-                              {i === 0
-                                ? `Arrive at the destination airport. Private luxury transfer to your accommodation (${packageData.packageAccommodation || "4-Star Hotel"}). Free evening to explore.`
-                                : i === packageData.packageDays - 1
-                                ? `Enjoy a hearty breakfast. Complete hotel checkout and transfer to airport for your onward journey.`
-                                : `Full day guided excursion. ${packageData.packageActivities || "Enjoy curated sightseeing tours, cultural landmarks, and local dining experiences."}`}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center text-slate-500 text-xs font-medium">
+                          No day-by-day itinerary details configured yet.
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -824,43 +826,54 @@ const PackageDetails = () => {
                         </h3>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
-                            <Hotel className="w-4 h-4 text-blue-600" /> Accommodation
-                          </div>
-                          <p className="text-xs text-slate-600">
-                            {packageData.packageAccommodation || "Premium hotel stay included"}
-                          </p>
+                      {packageData.inclusions && packageData.inclusions.length > 0 ? (
+                        <div className="space-y-3">
+                          {packageData.inclusions.map((inc, i) => (
+                            <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800">
+                              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span>{inc}</span>
+                            </div>
+                          ))}
                         </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                            <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                              <Hotel className="w-4 h-4 text-blue-600" /> Accommodation
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              {packageData.packageAccommodation || "Premium hotel stay included"}
+                            </p>
+                          </div>
 
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
-                            <Bus className="w-4 h-4 text-blue-600" /> Ground Transport
+                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                            <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                              <Bus className="w-4 h-4 text-blue-600" /> Ground Transport
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              {packageData.packageTransportation || "Private AC vehicle transfers"}
+                            </p>
                           </div>
-                          <p className="text-xs text-slate-600">
-                            {packageData.packageTransportation || "Private AC vehicle transfers"}
-                          </p>
-                        </div>
 
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
-                            <Utensils className="w-4 h-4 text-blue-600" /> Meal Plan
+                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                            <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                              <Utensils className="w-4 h-4 text-blue-600" /> Meal Plan
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              {packageData.packageMeals || "Daily breakfast & dinner included"}
+                            </p>
                           </div>
-                          <p className="text-xs text-slate-600">
-                            {packageData.packageMeals || "Daily breakfast & dinner included"}
-                          </p>
-                        </div>
 
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
-                            <Compass className="w-4 h-4 text-blue-600" /> Sightseeing & Activities
+                          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                            <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                              <Compass className="w-4 h-4 text-blue-600" /> Sightseeing & Activities
+                            </div>
+                            <p className="text-xs text-slate-600">
+                              {packageData.packageActivities || "Guided tours & attraction tickets"}
+                            </p>
                           </div>
-                          <p className="text-xs text-slate-600">
-                            {packageData.packageActivities || "Guided tours & attraction tickets"}
-                          </p>
                         </div>
-                      </div>
+                      )}
                     </div>
                   )}
 
@@ -873,24 +886,20 @@ const PackageDetails = () => {
                         </h3>
                       </div>
 
-                      <div className="space-y-3 text-xs text-slate-600">
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                          <span>International and domestic airfare ticket charges</span>
+                      {packageData.exclusions && packageData.exclusions.length > 0 ? (
+                        <div className="space-y-3 text-xs text-slate-600 font-medium">
+                          {packageData.exclusions.map((exc, i) => (
+                            <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                              <span>{exc}</span>
+                            </div>
+                          ))}
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                          <span>Personal expenses (laundry, telephone calls, tips)</span>
+                      ) : (
+                        <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center text-slate-500 text-xs font-medium">
+                          No specific exclusions specified.
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                          <span>Optional excursion charges and camera permits</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                          <span>Travel and medical insurance coverage</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   )}
 
@@ -1031,34 +1040,40 @@ const PackageDetails = () => {
                         </h3>
                       </div>
 
-                      <div className="space-y-3">
-                        {faqsList.map((faq, index) => {
-                          const isOpen = openFaqIndex === index;
-                          return (
-                            <div
-                              key={index}
-                              className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50"
-                            >
-                              <button
-                                onClick={() => setOpenFaqIndex(isOpen ? -1 : index)}
-                                className="w-full p-4 text-left font-extrabold text-xs text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                      {packageData.faqs && packageData.faqs.length > 0 ? (
+                        <div className="space-y-3">
+                          {packageData.faqs.map((faq, index) => {
+                            const isOpen = openFaqIndex === index;
+                            return (
+                              <div
+                                key={index}
+                                className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50"
                               >
-                                <span>{faq.q}</span>
-                                <ChevronDown
-                                  className={`w-4 h-4 text-slate-500 transition-transform ${
-                                    isOpen ? "rotate-180 text-blue-600" : ""
-                                  }`}
-                                />
-                              </button>
-                              {isOpen && (
-                                <div className="px-4 pb-4 text-xs text-slate-600 font-normal leading-relaxed border-t border-slate-200/60 pt-3">
-                                  {faq.a}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
+                                <button
+                                  onClick={() => setOpenFaqIndex(isOpen ? -1 : index)}
+                                  className="w-full p-4 text-left font-extrabold text-xs text-slate-900 flex items-center justify-between gap-4 cursor-pointer"
+                                >
+                                  <span>{faq.question || faq.q}</span>
+                                  <ChevronDown
+                                    className={`w-4 h-4 text-slate-500 transition-transform ${
+                                      isOpen ? "rotate-180 text-blue-600" : ""
+                                    }`}
+                                  />
+                                </button>
+                                {isOpen && (
+                                  <div className="px-4 pb-4 text-xs text-slate-600 font-normal leading-relaxed border-t border-slate-200/60 pt-3">
+                                    {faq.answer || faq.a}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center text-slate-500 text-xs font-medium">
+                          No FAQs currently available for this package.
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1076,38 +1091,39 @@ const PackageDetails = () => {
                   </div>
 
                   <div className="space-y-3.5 text-xs text-slate-700 font-semibold">
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{packageData.packageNights} Nights accommodation in 4-star hotel</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{packageData.packageMeals || "Daily breakfast"}</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{packageData.packageTransportation || "Private airport transfers"}</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{packageData.packageActivities || "All sightseeing on private basis"}</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>English speaking guide</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Entrance fees to all attractions</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Welcome drink on arrival</span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>All applicable taxes</span>
-                    </div>
+                    {packageData.inclusions && packageData.inclusions.length > 0 ? (
+                      packageData.inclusions.map((inc, i) => (
+                        <div key={i} className="flex items-start gap-2.5">
+                          <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{inc}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <>
+                        <div className="flex items-start gap-2.5">
+                          <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{packageData.packageNights} Nights accommodation ({packageData.hotel?.hotelName || packageData.packageAccommodation || "4-Star Hotel"})</span>
+                        </div>
+                        {packageData.packageMeals && (
+                          <div className="flex items-start gap-2.5">
+                            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{packageData.packageMeals}</span>
+                          </div>
+                        )}
+                        {packageData.packageTransportation && (
+                          <div className="flex items-start gap-2.5">
+                            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{packageData.packageTransportation}</span>
+                          </div>
+                        )}
+                        {packageData.packageActivities && (
+                          <div className="flex items-start gap-2.5">
+                            <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{packageData.packageActivities}</span>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

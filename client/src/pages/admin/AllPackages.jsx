@@ -169,13 +169,17 @@ const AllPackages = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-3 text-[11px] text-slate-500">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
                       <span className="flex items-center gap-1 text-slate-700 font-semibold">
                         <MapPin className="w-3 h-3 text-slate-400" /> {pack.packageDestination}
                       </span>
                       <span>&bull;</span>
                       <span className="font-bold text-slate-900">
                         ₹{pack.packageOffer ? pack.packageDiscountPrice : pack.packagePrice} / person
+                      </span>
+                      <span>&bull;</span>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                        Hotel: {pack.hotel?.hotelName || pack.packageAccommodation || "Hotel not assigned"}
                       </span>
                     </div>
                   </div>

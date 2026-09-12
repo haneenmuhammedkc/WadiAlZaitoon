@@ -111,3 +111,46 @@ export const ROOM_TYPES = [
     features: ["2 Bedrooms", "Kitchenette", "Balcony", "Free Laundry", "Kids Amenities"],
   },
 ];
+
+export const TRIP_TYPES = {
+  SOLO: "solo",
+  COUPLE: "couple",
+  FAMILY: "family",
+};
+
+export const TRIP_TYPE_LABELS = {
+  [TRIP_TYPES.SOLO]: "Solo Trip",
+  [TRIP_TYPES.COUPLE]: "Couple Trip",
+  [TRIP_TYPES.FAMILY]: "Family Trip",
+};
+
+export const TRIP_TYPE_OPTIONS = [
+  {
+    id: TRIP_TYPES.SOLO,
+    title: "SOLO TRIP",
+    subtitle: "1 Traveller",
+    description: "1 Adult",
+    adults: 1,
+    children: 0,
+    infants: 0,
+  },
+  {
+    id: TRIP_TYPES.COUPLE,
+    title: "COUPLE TRIP",
+    subtitle: "2 Travellers",
+    description: "2 Adults",
+    adults: 2,
+    children: 0,
+    infants: 0,
+  },
+  {
+    id: TRIP_TYPES.FAMILY,
+    title: "FAMILY TRIP",
+    subtitle: "Custom Group",
+    description: "Choose your travellers",
+    adults: 2,
+    children: 0,
+    infants: 0,
+  },
+];
+

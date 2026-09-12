@@ -1,4 +1,5 @@
 import Hotel from "../models/Hotel.js";
+import Package from "../models/Package.js";
 import { escapeRegex, isValidObjectId } from "../utils/security.js";
 
 // Public — Get All Active Hotels (supports search & destination filters)
@@ -31,7 +32,18 @@ export const getHotels = async (req, res, next) => {
       ];
     }
 
-    const hotels = await Hotel.find(query).sort({ createdAt: -1 });
+    const rawHotels = await Hotel.find(query).sort({ createdAt: -1 }).lean();
+
+    // Dynamically attach package usage for each hotel
+    const hotels = await Promise.all(
+      rawHotels.map(async (hotel) => {
+        const usedByPackages = await Package.find({ hotel: hotel._id }).select("packageName packageDestination").lean();
+        return {
+          ...hotel,
+          usedByPackages,
+        };
+      })
+    );
 
     return res.status(200).json({
       success: true,
@@ -55,9 +67,9 @@ export const getHotelById = async (req, res, next) => {
       });
     }
 
-    const hotel = await Hotel.findById(id);
+    const hotelDoc = await Hotel.findById(id).lean();
 
-    if (!hotel) {
+    if (!hotelDoc) {
       return res.status(404).json({
         success: false,
         message: "Hotel not found!",
@@ -68,12 +80,19 @@ export const getHotelById = async (req, res, next) => {
       req.user &&
       (req.user.user_role === 1 || req.user.userType === "admin" || req.user.isAdmin);
 
-    if (!hotel.isActive && !isAdminUser) {
+    if (!hotelDoc.isActive && !isAdminUser) {
       return res.status(404).json({
         success: false,
         message: "Hotel is currently inactive or not available.",
       });
     }
+
+    const usedByPackages = await Package.find({ hotel: hotelDoc._id }).select("packageName packageDestination packagePrice packageImages").lean();
+
+    const hotel = {
+      ...hotelDoc,
+      usedByPackages,
+    };
 
     return res.status(200).json({
       success: true,
@@ -99,8 +118,6 @@ export const createHotel = async (req, res, next) => {
 
     const {
       hotelName,
-      packageName,
-      packageId,
       location,
       destination,
       stay,
@@ -156,8 +173,6 @@ export const createHotel = async (req, res, next) => {
     // Mass-assignment protection: strict field extraction
     const hotelData = {
       hotelName: String(hotelName).trim(),
-      packageName: packageName ? String(packageName).trim() : "",
-      packageId: packageId || null,
       location: String(location).trim(),
       destination: String(destination).trim(),
       stay: stay ? String(stay).trim() : "5 Nights",
@@ -211,8 +226,6 @@ export const updateHotel = async (req, res, next) => {
     const allowedUpdates = {};
     const {
       hotelName,
-      packageName,
-      packageId,
       location,
       destination,
       stay,
@@ -229,8 +242,6 @@ export const updateHotel = async (req, res, next) => {
     } = req.body;
 
     if (hotelName !== undefined) allowedUpdates.hotelName = String(hotelName).trim();
-    if (packageName !== undefined) allowedUpdates.packageName = String(packageName).trim();
-    if (packageId !== undefined) allowedUpdates.packageId = packageId || null;
     if (location !== undefined) allowedUpdates.location = String(location).trim();
     if (destination !== undefined) allowedUpdates.destination = String(destination).trim();
     if (stay !== undefined) allowedUpdates.stay = String(stay).trim();
@@ -316,6 +327,15 @@ export const deleteHotel = async (req, res, next) => {
     const hotel = await Hotel.findById(id);
     if (!hotel) {
       return res.status(404).json({ success: false, message: "Hotel not found!" });
+    }
+
+    // Safety check: check if active packages reference this hotel
+    const packagesCount = await Package.countDocuments({ hotel: id });
+    if (packagesCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot deactivate hotel because it is currently assigned to ${packagesCount} active package(s). Please reassign or update those packages first.`,
+      });
     }
 
     // Safe Soft-Delete / Deactivation

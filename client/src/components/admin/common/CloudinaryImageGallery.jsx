@@ -69,7 +69,7 @@ const CloudinaryImageGallery = ({ packageImages = [], onChange, maxImages = 5 })
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-2">
-            <span>4. Image Gallery (Up to {maxImages} Images)</span>
+            <span>5. Image Gallery (Up to {maxImages} Images)</span>
           </h4>
           <p className="text-[11px] text-slate-500">
             Enter direct Cloudinary image URLs. Local file uploads are disabled.

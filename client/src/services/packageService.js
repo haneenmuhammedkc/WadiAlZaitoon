@@ -33,7 +33,7 @@ export const createPackage = async (packageData) => {
 
 export const updatePackage = async (id, packageData) => {
   try {
-    const res = await axiosInstance.put(`/package/update-package/${id}`, packageData);
+    const res = await axiosInstance.post(`/package/update-package/${id}`, packageData);
     return res.data;
   } catch (error) {
     return error.response?.data || { success: false, message: error.message };

@@ -1,10 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { AVAILABLE_ADDONS, ROOM_TYPES } from "../../constants/booking.constants";
+import { AVAILABLE_ADDONS, ROOM_TYPES, TRIP_TYPES } from "../../constants/booking.constants";
 
 const BookingContext = createContext();
 
 export const BookingProvider = ({ packageId, packageData, children }) => {
   const STORAGE_KEY = `wzt_booking_state_${packageId}`;
+
+  // Helper to derive trip type safely if missing in stored state
+  const deriveTripType = (adults, children, infants) => {
+    const a = adults !== undefined ? Number(adults) : 2;
+    const c = children !== undefined ? Number(children) : 0;
+    const i = infants !== undefined ? Number(infants) : 0;
+    if (a === 1 && c === 0 && i === 0) return TRIP_TYPES.SOLO;
+    if (a === 2 && c === 0 && i === 0) return TRIP_TYPES.COUPLE;
+    return TRIP_TYPES.FAMILY;
+  };
 
   // Initial State Factory
   const getInitialState = () => {
@@ -15,10 +25,17 @@ export const BookingProvider = ({ packageId, packageData, children }) => {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        
+        let validTripType = parsed.tripType;
+        if (!validTripType || !Object.values(TRIP_TYPES).includes(validTripType)) {
+          validTripType = deriveTripType(parsed.adults, parsed.children, parsed.infants);
+        }
+
         return {
           departureDate: parsed.departureDate || today,
           returnDate: parsed.returnDate || "",
-          adults: parsed.adults || 2,
+          tripType: validTripType,
+          adults: parsed.adults !== undefined ? parsed.adults : (validTripType === TRIP_TYPES.SOLO ? 1 : 2),
           children: parsed.children || 0,
           childAges: parsed.childAges || [],
           infants: parsed.infants || 0,
@@ -47,6 +64,7 @@ export const BookingProvider = ({ packageId, packageData, children }) => {
     return {
       departureDate: today,
       returnDate: "",
+      tripType: TRIP_TYPES.COUPLE,
       adults: 2,
       children: 0,
       childAges: [],
@@ -94,6 +112,7 @@ export const BookingProvider = ({ packageId, packageData, children }) => {
       const toSave = {
         departureDate: bookingState.departureDate,
         returnDate: bookingState.returnDate,
+        tripType: bookingState.tripType,
         adults: bookingState.adults,
         children: bookingState.children,
         childAges: bookingState.childAges,
@@ -111,6 +130,7 @@ export const BookingProvider = ({ packageId, packageData, children }) => {
       // Ignore storage quota errors
     }
   }, [bookingState, STORAGE_KEY]);
+
 
   // Update Travel Details (Step 1)
   const updateTravelDetails = (travelData) => {

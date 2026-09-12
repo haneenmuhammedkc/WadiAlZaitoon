@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link, useOutletContext } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,6 @@ import AllPackages from "./AllPackages";
 import AllUsers from "./AllUsers";
 import Payments from "./Payments";
 import RatingsReviews from "./RatingsReviews";
-import History from "./History";
 import AllHotels from "./AllHotels";
 import { getPaymentLedger } from "../../services/paymentService";
 import { getCurrentBookings } from "../../services/bookingService";
@@ -245,7 +244,7 @@ const AdminDashboard = () => {
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <button
-                  onClick={() => setActivePanelId(2)}
+                  onClick={() => setActivePanelId(1)}
                   className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all text-left space-y-2 group"
                 >
                   <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -256,7 +255,7 @@ const AdminDashboard = () => {
                 </button>
 
                 <button
-                  onClick={() => setActivePanelId(9)}
+                  onClick={() => setActivePanelId(3)}
                   className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all text-left space-y-2 group"
                 >
                   <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -267,7 +266,7 @@ const AdminDashboard = () => {
                 </button>
 
                 <button
-                  onClick={() => setActivePanelId(1)}
+                  onClick={() => setActivePanelId(6)}
                   className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all text-left space-y-2 group"
                 >
                   <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -300,7 +299,7 @@ const AdminDashboard = () => {
                     <p className="text-[11px] text-slate-500">Upcoming reservations</p>
                   </div>
                   <button
-                    onClick={() => setActivePanelId(1)}
+                    onClick={() => setActivePanelId(6)}
                     className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
                   >
                     View All <ArrowRight className="w-3.5 h-3.5" />
@@ -349,7 +348,7 @@ const AdminDashboard = () => {
                     <p className="text-[11px] text-slate-500">Active tour listings</p>
                   </div>
                   <button
-                    onClick={() => setActivePanelId(3)}
+                    onClick={() => setActivePanelId(2)}
                     className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
                   >
                     Catalog <ArrowRight className="w-3.5 h-3.5" />
@@ -392,16 +391,15 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* WORKSPACE PANELS (1-9) */}
-        {activePanelId === 1 && <AllBookings />}
-        {activePanelId === 2 && <AddPackages />}
-        {activePanelId === 3 && <AllPackages />}
+        {/* WORKSPACE PANELS (1-8) */}
+        {activePanelId === 1 && <AddPackages />}
+        {activePanelId === 2 && <AllPackages />}
+        {activePanelId === 3 && <AllHotels />}
         {activePanelId === 4 && <AllUsers />}
         {activePanelId === 5 && <Payments />}
-        {activePanelId === 6 && <RatingsReviews />}
-        {activePanelId === 7 && <History />}
+        {activePanelId === 6 && <AllBookings />}
+        {activePanelId === 7 && <RatingsReviews />}
         {activePanelId === 8 && <AdminUpdateProfile />}
-        {activePanelId === 9 && <AllHotels />}
       </motion.div>
     </AnimatePresence>
   );

@@ -340,6 +340,16 @@ const AllHotels = () => {
                   <span>Stay: <strong className="text-slate-800">{hotel.stay}</strong></span>
                   <span>Rating: <strong className="text-slate-800">{hotel.rating} ★</strong></span>
                 </div>
+
+                {hotel.usedByPackages && hotel.usedByPackages.length > 0 ? (
+                  <div className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                    Assigned to Packages: {hotel.usedByPackages.map((p) => p.packageName).join(", ")}
+                  </div>
+                ) : (
+                  <div className="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+                    Not assigned to any package
+                  </div>
+                )}
               </div>
             </StaggerItem>
           ))}

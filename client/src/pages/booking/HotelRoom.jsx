@@ -1,16 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { ROOM_TYPES } from "../../constants/booking.constants";
 import { Hotel as HotelIcon, Star, CheckCircle, ArrowRight, ArrowLeft, Coffee, Wifi, Waves, ShieldCheck } from "lucide-react";
 
 const HotelRoom = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromReview = location.state?.fromReview === true;
+
   const { packageId, packageData, bookingState, updateSelectedRoom } = useBooking();
 
   const hotel = packageData?.hotel || null;
   const hotelName = hotel?.hotelName || packageData?.packageAccommodation || "Partner Luxury Hotel Stay";
-  const location = hotel?.location || packageData?.packageDestination || "Destination Resort Area";
+  const hotelLocation = hotel?.location || packageData?.packageDestination || "Destination Resort Area";
   const rating = hotel?.rating || 4.8;
   const images = hotel?.hotelImages && hotel.hotelImages.length > 0
     ? hotel.hotelImages
@@ -24,12 +27,30 @@ const HotelRoom = () => {
       alert("Please select a room option to proceed.");
       return;
     }
+    if (fromReview) {
+      navigate(`/booking/${packageId}/review`);
+      return;
+    }
     navigate(`/booking/${packageId}/add-ons`);
   };
 
   return (
     <form onSubmit={handleContinue} className="space-y-6 font-sans">
       
+      {/* Review-Edit Banner */}
+      {fromReview && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between shadow-sm">
+          <span>Editing Accommodation Stay from Review Booking</span>
+          <button
+            type="button"
+            onClick={() => navigate(`/booking/${packageId}/review`)}
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 underline flex items-center gap-1 cursor-pointer"
+          >
+            ← Back to Review Booking
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-slate-200 pb-4">
         <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -54,7 +75,7 @@ const HotelRoom = () => {
                   <Star className="w-3 h-3 fill-amber-500 text-amber-500 mr-1" /> {rating}
                 </span>
               </div>
-              <p className="text-xs text-slate-500">{location} • {packageData?.packageNights} Nights Stay</p>
+              <p className="text-xs text-slate-500">{hotelLocation} • {packageData?.packageNights} Nights Stay</p>
             </div>
           </div>
         </div>
@@ -173,18 +194,18 @@ const HotelRoom = () => {
       <div className="flex items-center justify-between pt-2">
         <button
           type="button"
-          onClick={() => navigate(`/booking/${packageId}/travel`)}
-          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
+          onClick={() => navigate(fromReview ? `/booking/${packageId}/review` : `/booking/${packageId}/travel`)}
+          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span>{fromReview ? "Back to Review" : "Back"}</span>
         </button>
 
         <button
           type="submit"
           className="px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
         >
-          <span>Continue to Add-ons</span>
+          <span>{fromReview ? "SAVE & RETURN TO REVIEW" : "Continue to Add-ons"}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -194,3 +215,4 @@ const HotelRoom = () => {
 };
 
 export default HotelRoom;
+

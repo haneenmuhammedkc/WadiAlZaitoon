@@ -1,22 +1,43 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { AVAILABLE_ADDONS } from "../../constants/booking.constants";
 import { Sparkles, Plus, Check, Trash2, ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
 
 const AddOns = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromReview = location.state?.fromReview === true;
+
   const { packageId, bookingState, toggleAddOn, calculateTotals } = useBooking();
   const totals = calculateTotals();
 
   const handleContinue = (e) => {
     e.preventDefault();
+    if (fromReview) {
+      navigate(`/booking/${packageId}/review`);
+      return;
+    }
     navigate(`/booking/${packageId}/travellers`);
   };
 
   return (
     <form onSubmit={handleContinue} className="space-y-6 font-sans">
       
+      {/* Review-Edit Banner */}
+      {fromReview && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-between shadow-sm">
+          <span>Editing Add-ons from Review Booking</span>
+          <button
+            type="button"
+            onClick={() => navigate(`/booking/${packageId}/review`)}
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-900 underline flex items-center gap-1 cursor-pointer"
+          >
+            ← Back to Review Booking
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
@@ -30,10 +51,10 @@ const AddOns = () => {
 
         <button
           type="button"
-          onClick={() => navigate(`/booking/${packageId}/travellers`)}
-          className="text-xs font-bold text-slate-500 hover:text-slate-900 underline underline-offset-4 self-start sm:self-auto"
+          onClick={() => navigate(fromReview ? `/booking/${packageId}/review` : `/booking/${packageId}/travellers`)}
+          className="text-xs font-bold text-slate-500 hover:text-slate-900 underline underline-offset-4 self-start sm:self-auto cursor-pointer"
         >
-          Skip add-ons for now
+          {fromReview ? "Done editing add-ons" : "Skip add-ons for now"}
         </button>
       </div>
 
@@ -72,7 +93,7 @@ const AddOns = () => {
                 <button
                   type="button"
                   onClick={() => toggleAddOn(addon)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSelected
                       ? "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
                       : "bg-slate-900 text-white hover:bg-slate-800"
@@ -113,7 +134,7 @@ const AddOns = () => {
                   <button
                     type="button"
                     onClick={() => toggleAddOn(item)}
-                    className="text-emerald-600 hover:text-emerald-700 p-1"
+                    className="text-emerald-600 hover:text-emerald-700 p-1 cursor-pointer"
                     title="Remove Add-on"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -134,18 +155,18 @@ const AddOns = () => {
       <div className="flex items-center justify-between pt-2">
         <button
           type="button"
-          onClick={() => navigate(`/booking/${packageId}/hotel`)}
-          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
+          onClick={() => navigate(fromReview ? `/booking/${packageId}/review` : `/booking/${packageId}/hotel`)}
+          className="px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span>{fromReview ? "Back to Review" : "Back"}</span>
         </button>
 
         <button
           type="submit"
           className="px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
         >
-          <span>Continue to Traveller Details</span>
+          <span>{fromReview ? "SAVE & RETURN TO REVIEW" : "Continue to Traveller Details"}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -155,3 +176,4 @@ const AddOns = () => {
 };
 
 export default AddOns;
+
