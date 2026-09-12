@@ -36,8 +36,9 @@ const Register = () => {
       }
 
       setLoading(false);
-      alert("Account created successfully! Please sign in.");
-      navigate("/login");
+      navigate("/verify-email", {
+        state: { email: formData.email },
+      });
     } catch (err) {
       setError(err.message);
       setLoading(false);

@@ -3,21 +3,29 @@ import {
   logOutController,
   loginController,
   signupController,
+  verifyEmailController,
+  resendOtpController,
+  forgotPasswordController,
+  verifyResetOtpController,
+  resetPasswordController,
   test,
 } from "../controllers/authController.js";
 
 const router = express.Router();
 
-//test route
+// Test route
 router.get("/test", test);
 
-//signup route
+// Authentication routes
 router.post("/signup", signupController);
-
-//login route
 router.post("/login", loginController);
-
-//logout route
 router.get("/logout", logOutController);
+
+// OTP & Verification routes
+router.post("/verify-email", verifyEmailController);
+router.post("/resend-otp", resendOtpController);
+router.post("/forgot-password", forgotPasswordController);
+router.post("/verify-reset-otp", verifyResetOtpController);
+router.post("/reset-password", resetPasswordController);
 
 export default router;

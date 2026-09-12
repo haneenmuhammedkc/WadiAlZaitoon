@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import AdminHeader from "../../components/admin/common/AdminHeader";
-import AdminSidebar from "../../components/admin/common/AdminSidebar";
-import { PageTransition } from "../../components/animations/Motion";
-import { updateProfilePhoto, deleteUser } from "../../services/userService";
-import { useAuth } from "../../context/AuthContext";
+import AdminHeader from "../components/admin/common/AdminHeader";
+import AdminSidebar from "../components/admin/common/AdminSidebar";
+import { PageTransition } from "../components/animations/Motion";
+import { updateProfilePhoto, deleteUser } from "../services/userService";
+import { useAuth } from "../context/AuthContext";
 
 const AdminLayout = () => {
   const navigate = useNavigate();

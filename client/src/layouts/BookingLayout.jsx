@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useLocation, Outlet, Link } from "react-router-dom";
-import { BookingProvider } from "../../pages/booking/BookingContext";
-import BookingSummary from "../booking/BookingSummary";
-import { CHECKOUT_STEPS } from "../../constants/booking.constants";
-import { getPackageById } from "../../services/packageService";
-import { PageTransition } from "../animations/Motion";
+import { BookingProvider } from "../pages/booking/BookingContext";
+import BookingSummary from "../components/booking/BookingSummary";
+import { CHECKOUT_STEPS } from "../constants/booking.constants";
+import { getPackageById } from "../services/packageService";
+import { PageTransition } from "../components/animations/Motion";
 import { ShieldCheck } from "lucide-react";
 
 const BookingLayout = () => {

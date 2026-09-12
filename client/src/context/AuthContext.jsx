@@ -43,13 +43,25 @@ export const AuthProvider = ({ children }) => {
         const msg = data?.message || "Login failed";
         setError(msg);
         setLoading(false);
-        return { success: false, message: msg };
+        return {
+          success: false,
+          message: msg,
+          isEmailVerified: data?.isEmailVerified,
+          email: data?.email || credentials?.email,
+          data,
+        };
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Login failed";
+      const errData = err.response?.data;
+      const msg = errData?.message || err.message || "Login failed";
       setError(msg);
       setLoading(false);
-      return { success: false, message: msg };
+      return {
+        success: false,
+        message: msg,
+        isEmailVerified: errData?.isEmailVerified,
+        email: errData?.email || credentials?.email,
+      };
     }
   };
 

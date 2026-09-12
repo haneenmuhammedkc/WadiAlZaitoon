@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, LogIn, CheckCircle2, ShieldAlert, ArrowRight } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { PageTransition, FadeIn } from "../../components/animations/Motion";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [unverifiedState, setUnverifiedState] = useState(null);
   const { user: currentUser, login, loading, error } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navMessage = location.state?.message || null;
 
   useEffect(() => {
     if (currentUser) {
@@ -27,6 +31,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUnverifiedState(null);
     const result = await login(formData);
     if (result.success) {
       const loggedInUser = result.user;
@@ -35,6 +40,11 @@ const Login = () => {
       } else {
         navigate("/", { replace: true });
       }
+    } else if (result.isEmailVerified === false) {
+      setUnverifiedState({
+        email: result.email || formData.email,
+        message: result.message || "Your email is not verified yet.",
+      });
     }
   };
 
@@ -57,10 +67,40 @@ const Login = () => {
                 </p>
               </div>
 
-              {error && (
-                <div className="p-4 rounded-xl bg-red-50 text-red-700 text-xs font-semibold border border-red-200 text-center">
-                  {error}
+              {navMessage && !error && !unverifiedState && (
+                <div className="p-4 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200 text-center flex items-center justify-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>{navMessage}</span>
                 </div>
+              )}
+
+              {unverifiedState ? (
+                <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-3 text-center">
+                  <div className="flex items-center justify-center gap-2 text-amber-800 font-bold text-xs">
+                    <ShieldAlert className="w-4 h-4 text-amber-600" />
+                    <span>Email Verification Required</span>
+                  </div>
+                  <p className="text-xs text-amber-700">
+                    {unverifiedState.message}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate("/verify-email", {
+                        state: { email: unverifiedState.email },
+                      })
+                    }
+                    className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    Verify Your Email Now <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                error && (
+                  <div className="p-4 rounded-xl bg-red-50 text-red-700 text-xs font-semibold border border-red-200 text-center">
+                    {error}
+                  </div>
+                )
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,7 +121,15 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">Password</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">Password</label>
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs font-bold text-coral-600 hover:underline"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}

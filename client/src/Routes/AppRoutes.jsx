@@ -6,10 +6,17 @@ import PrivateRoute from "../Routes/PrivateRoute";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
 import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import VerifyEmail from "../pages/auth/VerifyEmail";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import VerifyResetOtp from "../pages/auth/VerifyResetOtp";
+import ResetPassword from "../pages/auth/ResetPassword";
+import PasswordResetSuccess from "../pages/auth/PasswordResetSuccess";
+
 import Home from "../pages/landing/Home";
 import Hotels from "../pages/hotel/Hotels";
 
-import BookingLayout from "../components/layout/BookingLayout";
+import BookingLayout from "../layouts/BookingLayout";
 import TravelDetails from "../pages/booking/TravelDetails";
 import HotelRoom from "../pages/booking/HotelRoom";
 import AddOns from "../pages/booking/AddOns";
@@ -18,7 +25,6 @@ import ReviewBooking from "../pages/booking/ReviewBooking";
 import PaymentStep from "../pages/booking/PaymentStep";
 import BookingConfirmation from "../pages/booking/BookingConfirmation";
 
-import Register from "../pages/auth/Register";
 import Profile from "../pages/profile/Profile";
 import Package from "../pages/package/Package";
 import RatingsPage from "../pages/RatingsPage";
@@ -27,18 +33,28 @@ import UpdatePackage from "../pages/admin/UpdatePackage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import PackageDetails from "../pages/package/PackageDetails";
 import PackageCollectionPage from "../pages/package/PackageCollectionPage";
-import PublicLayout from "../components/layout/PublicLayout";
-import AdminLayout from "../components/layout/AdminLayout";
+import PublicLayout from "../layouts/PublicLayout";
+import AdminLayout from "../layouts/AdminLayout";
+import AuthLayout from "../layouts/AuthLayout";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* STANDALONE AUTHENTICATION ROUTES (Wrapped in AuthLayout with NO Header & NO Footer) */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/password-reset-success" element={<PasswordResetSuccess />} />
+        </Route>
+
         {/* PUBLIC WEBSITE ROUTES (Wrapped in PublicLayout with Header & Footer) */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Register />} />
           <Route path="/search" element={<Package />} />
           <Route path="/packages" element={<PackageCollectionPage />} />
           <Route path="/packages/all" element={<Package />} />

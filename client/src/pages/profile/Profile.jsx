@@ -45,6 +45,7 @@ const Profile = () => {
 
   // Booking Stats State
   const [activeBookingsCount, setActiveBookingsCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -73,6 +74,7 @@ const Profile = () => {
   // Handle Profile Details Update
   const handleUpdateUserDetails = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const data = await updateProfile(currentUser._id, formData);
       if (data?.success) {
@@ -87,6 +89,8 @@ const Profile = () => {
       }
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,6 +109,7 @@ const Profile = () => {
       alert("New password cannot be identical to your current password!");
       return;
     }
+    setLoading(true);
     try {
       const data = await updatePasswordApi(currentUser._id, updatePassword);
       if (data?.success) {
@@ -118,6 +123,8 @@ const Profile = () => {
       }
     } catch (err) {
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
