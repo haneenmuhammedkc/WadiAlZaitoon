@@ -12,12 +12,22 @@ const router = express.Router();
 
 //user auth
 router.get("/user-auth", requireSignIn, (req, res) => {
-  return res.status(200).send({ check: true });
+  const { password, ...rest } = req.user._doc || req.user;
+  return res.status(200).send({
+    success: true,
+    check: true,
+    user: rest,
+  });
 });
 
 //admin auth
 router.get("/admin-auth", requireSignIn, isAdmin, (req, res) => {
-  res.status(200).send({ check: true });
+  const { password, ...rest } = req.user._doc || req.user;
+  return res.status(200).send({
+    success: true,
+    check: true,
+    user: rest,
+  });
 });
 
 //update user details

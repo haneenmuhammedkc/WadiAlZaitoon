@@ -98,7 +98,6 @@ const parseAddressData = (rawAddress) => {
 
   const customName = parsed.customField?.name ? String(parsed.customField.name).trim() : "";
   const customVal = parsed.customField?.value ? String(parsed.customField.value).trim() : "";
-  const hasCustom = Boolean(customName && customVal);
 
   return {
     streetAddress: parsed.streetAddress ? String(parsed.streetAddress).trim() : "",
@@ -108,8 +107,8 @@ const parseAddressData = (rawAddress) => {
     postalCode: parsed.postalCode ? String(parsed.postalCode).trim() : "",
     country: parsed.country ? String(parsed.country).trim() : "",
     customField: {
-      name: hasCustom ? customName.slice(0, 50) : "",
-      value: hasCustom ? customVal.slice(0, 250) : "",
+      name: customName.slice(0, 50),
+      value: customVal.slice(0, 250),
     },
   };
 };
@@ -465,14 +464,10 @@ const Profile = () => {
 
               <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
                 <button
-                  onClick={() => {
-                    if (isEditingProfile) handleCancelEdit();
-                    else setIsEditingProfile(true);
-                  }}
+                  onClick={handleLogout}
                   className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2"
                 >
-                  <Edit3 className="w-4 h-4" />
-                  {isEditingProfile ? "Close Edit Mode" : "Edit Profile"}
+                  Log out
                 </button>
               </div>
             </div>
@@ -1043,30 +1038,6 @@ const Profile = () => {
                   </button>
                 </div>
               </form>
-            </div>
-          </FadeIn>
-
-          {/* Account Actions */}
-          <FadeIn>
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-extrabold text-xl text-slate-900">
-                    ACCOUNT ACTIONS
-                  </h3>
-                  <p className="text-xs text-slate-500 font-normal">
-                    Sign out of your Wadi Al Zaitoon account.
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleLogout}
-                  className="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-sm flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  LOG OUT
-                </button>
-              </div>
             </div>
           </FadeIn>
 
