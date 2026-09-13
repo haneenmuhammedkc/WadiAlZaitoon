@@ -30,6 +30,7 @@ import RatingsPage from "../pages/RatingsPage";
 import HotelDetails from "../pages/hotel/HotelDetails";
 import UpdatePackage from "../pages/admin/UpdatePackage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminProfile from "../pages/admin/AdminProfile";
 import PackageDetails from "../pages/package/PackageDetails";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
@@ -64,7 +65,7 @@ const AppRoutes = () => {
           <Route path="/package/ratings/:id" element={<RatingsPage />} />
 
           {/* User Protected Routes */}
-          <Route path="/profile" element={<PrivateRoute />}>
+          <Route path="/profile" element={<PrivateRoute allowAdmin={false} />}>
             <Route path="user" element={<Profile />} />
           </Route>
 
@@ -87,6 +88,7 @@ const AppRoutes = () => {
         <Route path="/profile" element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/profile" element={<AdminProfile />} />
             <Route path="admin/update-package/:id" element={<UpdatePackage />} />
           </Route>
         </Route>

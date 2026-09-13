@@ -16,11 +16,12 @@ const Login = () => {
 
   useEffect(() => {
     if (currentUser) {
-      const targetPath =
-        currentUser.user_role === 1 || currentUser.user_role === "admin" ? "/profile/admin" : "/";
+      const fromPath = location.state?.from?.pathname;
+      const isAdmin = currentUser.user_role === 1 || currentUser.user_role === "admin";
+      const targetPath = fromPath || (isAdmin ? "/profile/admin" : "/profile/user");
       navigate(targetPath, { replace: true });
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, location]);
 
   const handleChange = (e) => {
     setFormData({
@@ -35,11 +36,10 @@ const Login = () => {
     const result = await login(formData);
     if (result.success) {
       const loggedInUser = result.user;
-      if (loggedInUser?.user_role === 1 || loggedInUser?.user_role === "admin") {
-        navigate("/profile/admin", { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
+      const fromPath = location.state?.from?.pathname;
+      const isAdmin = loggedInUser?.user_role === 1 || loggedInUser?.user_role === "admin";
+      const targetPath = fromPath || (isAdmin ? "/profile/admin" : "/profile/user");
+      navigate(targetPath, { replace: true });
     } else if (result.isEmailVerified === false) {
       setUnverifiedState({
         email: result.email || formData.email,

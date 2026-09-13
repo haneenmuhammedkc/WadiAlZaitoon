@@ -21,15 +21,6 @@ export const updatePassword = async (userId, passwordData) => {
   }
 };
 
-export const deleteUser = async (userId) => {
-  try {
-    const res = await axiosInstance.delete(`/user/delete/${userId}`);
-    return res.data;
-  } catch (error) {
-    return error.response?.data || { success: false, message: error.message };
-  }
-};
-
 export const getAllUsers = async () => {
   try {
     const res = await axiosInstance.get("/user/getAllUsers");
@@ -69,7 +60,6 @@ export const checkAdminAuth = async () => {
 export default {
   updateProfile,
   updatePassword,
-  deleteUser,
   getAllUsers,
   deleteUserAdmin,
   checkUserAuth,

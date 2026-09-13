@@ -51,7 +51,6 @@ const AdminSidebar = ({
   setMobileSidebarOpen,
   currentUser,
   onLogout,
-  onDeleteAccount,
 }) => {
   const closeMobileSidebar = () => {
     if (setMobileSidebarOpen) setMobileSidebarOpen(false);
@@ -110,36 +109,28 @@ const AdminSidebar = ({
           </nav>
         </div>
 
-        {/* Sidebar Bottom Profile Card */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/50">
-          <div className="flex items-center justify-between p-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                <User className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="font-bold text-xs text-white block truncate max-w-[110px]">
-                  {currentUser?.username}
-                </span>
-                <button
-                  onClick={() => setActivePanelId && setActivePanelId(8)}
-                  className="text-[10px] text-emerald-400 hover:underline font-medium block"
-                >
-                  Edit Profile
-                </button>
-              </div>
+        {/* Sidebar Bottom Container — Admin Identity (Left) & Log Out Button (Right) */}
+        <div className="p-4 border-t border-slate-800 bg-slate-950/50 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+              <User className="w-4 h-4" />
             </div>
-
-            {onDeleteAccount && (
-              <button
-                onClick={onDeleteAccount}
-                className="text-slate-500 hover:text-red-500 text-[10px] font-medium"
-                title="Delete Admin Account"
-              >
-                Delete
-              </button>
-            )}
+            <div className="min-w-0">
+              <span className="font-bold text-xs text-white block truncate">
+                {currentUser?.username || "Admin"}
+              </span>
+            </div>
           </div>
+
+          <button
+            type="button"
+            onClick={onLogout}
+            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-red-600/80 text-slate-300 hover:text-white text-[11px] font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border border-slate-700/50"
+            title="Log Out"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Log Out</span>
+          </button>
         </div>
       </aside>
 
@@ -212,15 +203,29 @@ const AdminSidebar = ({
                 </nav>
               </div>
 
-              <div className="p-4 border-t border-slate-800">
+              <div className="p-4 border-t border-slate-800 bg-slate-950/50 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-xs text-white block truncate">
+                      {currentUser?.username || "Admin"}
+                    </span>
+                  </div>
+                </div>
+
                 <button
+                  type="button"
                   onClick={() => {
                     closeMobileSidebar();
                     if (onLogout) onLogout();
                   }}
-                  className="w-full py-2.5 rounded-xl bg-slate-800 text-white hover:bg-emerald-600 text-xs font-bold transition-all flex items-center justify-center gap-2"
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-red-600/80 text-slate-300 hover:text-white text-xs font-semibold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border border-slate-700/50"
+                  title="Log Out"
                 >
-                  <LogOut className="w-4 h-4" /> Sign Out
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log Out</span>
                 </button>
               </div>
             </motion.aside>

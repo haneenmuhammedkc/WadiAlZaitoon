@@ -178,39 +178,6 @@ export const updateUserPassword = async (req, res, next) => {
   }
 };
 
-//delete user
-export const deleteUserAccount = async (req, res, next) => {
-  try {
-    if (!isValidObjectId(req.params.id)) {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid user ID format!",
-      });
-    }
-
-    if (String(req.user._id) !== String(req.params.id)) {
-      return res.status(403).send({
-        success: false,
-        message: "You can only delete your account!",
-      });
-    }
-
-    await User.findByIdAndDelete(req.params.id);
-    res.clearCookie("X_TTMS_access_token", {
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
-    return res.status(200).send({
-      success: true,
-      message: "User account has been deleted!",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 //get all users admin
 export const getAllUsers = async (req, res, next) => {
   try {

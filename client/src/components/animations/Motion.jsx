@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
-export const PageTransition = ({ children }) => {
+export const PageTransition = ({ children, className = "" }) => {
   const shouldReduceMotion = useReducedMotion();
 
   const variants = {
@@ -11,7 +11,7 @@ export const PageTransition = ({ children }) => {
   };
 
   return (
-    <motion.div initial="initial" animate="animate" exit="exit" variants={variants}>
+    <motion.div initial="initial" animate="animate" exit="exit" variants={variants} className={className}>
       {children}
     </motion.div>
   );

@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  deleteUserAccount,
   deleteUserAccountAdmin,
   getAllUsers,
   updateUser,
@@ -35,9 +34,6 @@ router.post("/update/:id", requireSignIn, updateUser);
 
 //update user password
 router.post("/update-password/:id", requireSignIn, updateUserPassword);
-
-//delete user account
-router.delete("/delete/:id", requireSignIn, deleteUserAccount);
 
 //get all users
 router.get("/getAllUsers", requireSignIn, isAdmin, getAllUsers);
