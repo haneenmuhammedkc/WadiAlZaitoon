@@ -172,11 +172,12 @@ export const BookingProvider = ({ packageId, packageData, children }) => {
   };
 
   // Update Review Terms Acceptance (Step 5)
-  const updateTermsAcceptance = (termsAccepted, policyAccepted) => {
+  const updateTermsAcceptance = (termsAccepted, policyAccepted, cancellationPolicyAccepted) => {
     setBookingState((prev) => ({
       ...prev,
       termsAccepted,
       policyAccepted,
+      cancellationPolicyAccepted: cancellationPolicyAccepted !== undefined ? cancellationPolicyAccepted : policyAccepted,
     }));
   };
 

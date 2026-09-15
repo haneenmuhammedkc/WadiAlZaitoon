@@ -166,7 +166,7 @@ const PaymentStep = () => {
           Secure Checkout
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          Complete your reservation using 256-Bit SSL encrypted Razorpay payment gateway.
+          Complete your reservation using our authorized Razorpay payment gateway.
         </p>
       </div>
 
@@ -191,7 +191,7 @@ const PaymentStep = () => {
           </div>
 
           <span className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider bg-slate-800 text-emerald-400 px-3 py-1 rounded-full border border-slate-700">
-            <ShieldCheck className="w-3.5 h-3.5" /> 256-Bit SSL
+            <ShieldCheck className="w-3.5 h-3.5" /> Authorized Gateway
           </span>
         </div>
 
@@ -206,9 +206,10 @@ const PaymentStep = () => {
           </span>
         </div>
 
-        <p className="text-xs text-slate-300 leading-relaxed font-normal">
-          Your payment details are protected by Razorpay SSL 256-bit encryption. Wadi Al Zaitoon does not store your card or bank credentials.
-        </p>
+        <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/80 text-xs text-slate-300 flex items-center gap-2">
+          <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span><strong>🔒 Secure Payment:</strong> Your payment is processed securely through our authorized payment gateway. Complete card credentials are never stored on our servers.</span>
+        </div>
 
         {/* Dynamic CTA Button */}
         <button

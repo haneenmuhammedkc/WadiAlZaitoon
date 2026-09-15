@@ -53,8 +53,11 @@ const Footer = () => {
 
           {/* Services & Reviews */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Services</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Legal & Services</h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
+              <li>
+                <Link to="/terms-and-conditions" className="hover:text-emerald-400 transition-colors">Terms & Conditions</Link>
+              </li>
               <li>
                 <Link to="/reviews" className="hover:text-emerald-400 transition-colors">Traveler Reviews</Link>
               </li>
@@ -80,19 +83,24 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>+971 4 123 4567</span>
+                <span>+971 52 167 9632</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>info@wadialzaitoondxb.com</span>
+                <span>Wadialzaitoondxb@gmail.com</span>
               </li>
             </ul>
           </div>
 
         </div>
 
-        <div className="pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Wadi Al Zaitoon Tourism. All rights reserved.</p>
+        <div className="pt-8 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© {new Date().getFullYear()} WADI AL ZAITOON TOURISM LLC. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/terms-and-conditions" className="hover:text-emerald-400 transition-colors">
+              Terms & Conditions
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

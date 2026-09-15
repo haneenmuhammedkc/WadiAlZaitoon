@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "./BookingContext";
 import { CheckCircle2, Edit3, MapPin, Calendar, Users, Hotel as HotelIcon, Sparkles, User, ShieldCheck, ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
 import { TRIP_TYPE_LABELS } from "../../constants/booking.constants";
@@ -10,7 +9,8 @@ const ReviewBooking = () => {
   const totals = calculateTotals();
 
   const [termsAccepted, setTermsAccepted] = useState(bookingState.termsAccepted || false);
-  const [detailsConfirmed, setDetailsConfirmed] = useState(bookingState.policyAccepted || false);
+  const [cancellationPolicyAccepted, setCancellationPolicyAccepted] = useState(bookingState.cancellationPolicyAccepted || bookingState.policyAccepted || false);
+  const [detailsConfirmed, setDetailsConfirmed] = useState(bookingState.detailsConfirmed || false);
 
   const formattedDeparture = bookingState.departureDate
     ? new Date(bookingState.departureDate).toLocaleDateString("en-IN", {
@@ -30,11 +30,11 @@ const ReviewBooking = () => {
 
   const handleContinue = (e) => {
     e.preventDefault();
-    if (!termsAccepted || !detailsConfirmed) {
-      alert("Please accept the Terms & Conditions and confirm all booking details.");
+    if (!termsAccepted || !cancellationPolicyAccepted || !detailsConfirmed) {
+      alert("Please agree to the Terms & Conditions, Cancellation & Refund Policy, and confirm all booking details.");
       return;
     }
-    updateTermsAcceptance(termsAccepted, detailsConfirmed);
+    updateTermsAcceptance(termsAccepted, detailsConfirmed, cancellationPolicyAccepted);
     navigate(`/booking/${packageId}/payment`);
   };
 
@@ -251,7 +251,26 @@ const ReviewBooking = () => {
             required
           />
           <span className="text-xs font-semibold text-slate-800">
-            I agree to the Terms & Conditions and Cancellation & Refund Policy.
+            I agree to the{" "}
+            <Link to="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="text-emerald-700 font-bold hover:underline">
+              Terms & Conditions
+            </Link>.
+          </span>
+        </label>
+
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={cancellationPolicyAccepted}
+            onChange={(e) => setCancellationPolicyAccepted(e.target.checked)}
+            className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 mt-0.5"
+            required
+          />
+          <span className="text-xs font-semibold text-slate-800">
+            I agree to the{" "}
+            <Link to="/terms-and-conditions#cancellation-refund" target="_blank" rel="noopener noreferrer" className="text-emerald-700 font-bold hover:underline">
+              Cancellation & Refund Policy
+            </Link>.
           </span>
         </label>
 
@@ -264,7 +283,7 @@ const ReviewBooking = () => {
             required
           />
           <span className="text-xs font-semibold text-slate-800">
-            I confirm that all booking details, dates, and traveller names are correct.
+            I confirm that all traveller and booking details provided are correct.
           </span>
         </label>
       </div>

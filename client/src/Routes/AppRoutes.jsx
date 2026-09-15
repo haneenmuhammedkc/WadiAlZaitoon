@@ -32,6 +32,7 @@ import UpdatePackage from "../pages/admin/UpdatePackage";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminProfile from "../pages/admin/AdminProfile";
 import PackageDetails from "../pages/package/PackageDetails";
+import TermsAndConditions from "../pages/TermsAndConditions";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -61,6 +62,7 @@ const AppRoutes = () => {
           <Route path="/reviews" element={<RatingsPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/package/:id" element={<PackageDetails />} />
           <Route path="/package/ratings/:id" element={<RatingsPage />} />
 
